@@ -275,8 +275,21 @@ def admin_dashboard():
     organ_donors = db.execute("SELECT COUNT(*) FROM donors WHERE donor_type IN ('organ', 'both')").fetchone()[0]
     total_searches = db.execute("SELECT COUNT(*) FROM search_logs").fetchone()[0]
     
-    # Recent donors
+    # Recent donors (all)
     recent_donors = db.execute("SELECT * FROM donors ORDER BY created_at DESC LIMIT 50").fetchall()
+    
+    # Separate lists for blood and organ donors
+    blood_only_donors = db.execute("""
+        SELECT * FROM donors 
+        WHERE donor_type IN ('blood', 'both') 
+        ORDER BY created_at DESC
+    """).fetchall()
+    
+    organ_only_donors = db.execute("""
+        SELECT * FROM donors 
+        WHERE donor_type IN ('organ', 'both') 
+        ORDER BY created_at DESC
+    """).fetchall()
     
     # Blood group distribution
     blood_distribution = db.execute("""
@@ -293,6 +306,8 @@ def admin_dashboard():
                            organ_donors=organ_donors,
                            total_searches=total_searches,
                            recent_donors=recent_donors,
+                           blood_only_donors=blood_only_donors,
+                           organ_only_donors=organ_only_donors,
                            blood_distribution=blood_distribution)
 
 @app.route('/admin/donors/delete/<int:donor_id>', methods=['POST'])

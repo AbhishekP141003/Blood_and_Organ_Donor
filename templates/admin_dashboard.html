@@ -33,6 +33,44 @@
         font-weight: 600;
     }
 
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .tab {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+    }
+
+    .tab:hover {
+        color: var(--accent-primary);
+        background: var(--bg-secondary);
+    }
+
+    .tab.active {
+        color: var(--accent-primary);
+        border-bottom-color: var(--accent-primary);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
     .donor-table {
         width: 100%;
         border-collapse: collapse;
@@ -151,83 +189,192 @@
         </div>
         {% endif %}
 
-        <!-- Donors Table -->
+        <!-- Tabs for Blood/Organ Donors -->
         <div>
-            <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3>👥 Registered Donors</h3>
-                <input type="text" id="searchInput" placeholder="Search donors..." style="max-width: 300px;"
-                    onkeyup="filterTable()">
+            <h3 style="margin-bottom: 1rem;">👥 Registered Donors</h3>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('all')">
+                    All Donors ({{ recent_donors|length }})
+                </button>
+                <button class="tab" onclick="switchTab('blood')">
+                    🩸 Blood Donors ({{ blood_only_donors|length }})
+                </button>
+                <button class="tab" onclick="switchTab('organ')">
+                    🫀 Organ Donors ({{ organ_only_donors|length }})
+                </button>
             </div>
 
-            <div class="table-container">
-                <table class="donor-table" id="donorTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Area</th>
-                            <th>Type</th>
-                            <th>Blood Group</th>
-                            <th>Available</th>
-                            <th>Registered</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for donor in recent_donors %}
-                        <tr>
-                            <td>{{ donor.id }}</td>
-                            <td><strong>{{ donor.name }}</strong></td>
-                            <td>{{ donor.phone }}</td>
-                            <td>{{ donor.area or '-' }}</td>
-                            <td>
-                                {% if donor.donor_type == 'blood' %}
-                                <span class="badge badge-blood">Blood</span>
-                                {% elif donor.donor_type == 'organ' %}
-                                <span class="badge badge-organ">Organ</span>
-                                {% else %}
-                                <span class="badge badge-both">Both</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ donor.blood_group or '-' }}</td>
-                            <td>
-                                {% if donor.is_available == 'yes' %}
-                                <span style="color: var(--accent-green);">✓ Yes</span>
-                                {% else %}
-                                <span style="color: var(--accent-red);">✗ No</span>
-                                {% endif %}
-                            </td>
-                            <td style="font-size: 0.8rem;">{{ donor.created_at[:10] }}</td>
-                            <td>
-                                <form method="POST" action="/admin/donors/delete/{{ donor.id }}"
-                                    style="display: inline;" onsubmit="return confirm('Delete this donor?');">
-                                    <button type="submit" class="btn btn-danger"
-                                        style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <!-- All Donors Tab -->
+            <div id="tab-all" class="tab-content active">
+                <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <p class="text-muted">Showing all registered donors</p>
+                    <input type="text" id="searchAll" placeholder="Search donors..." style="max-width: 300px;"
+                        onkeyup="filterTable('tableAll', 'searchAll')">
+                </div>
+                {% include 'donor_table.html' %}
             </div>
 
-            {% if recent_donors|length == 0 %}
-            <div class="text-center text-muted" style="padding: 3rem;">
-                No donors registered yet.
+            <!-- Blood Donors Tab -->
+            <div id="tab-blood" class="tab-content">
+                <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <p class="text-muted">Donors who can donate blood</p>
+                    <input type="text" id="searchBlood" placeholder="Search blood donors..." style="max-width: 300px;"
+                        onkeyup="filterTable('tableBlood', 'searchBlood')">
+                </div>
+
+                <div class="table-container">
+                    <table class="donor-table" id="tableBlood">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Area</th>
+                                <th>Type</th>
+                                <th>Blood Group</th>
+                                <th>Available</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donor in blood_only_donors %}
+                            <tr>
+                                <td>{{ donor.id }}</td>
+                                <td><strong>{{ donor.name }}</strong></td>
+                                <td>{{ donor.phone }}</td>
+                                <td>{{ donor.area or '-' }}</td>
+                                <td>
+                                    {% if donor.donor_type == 'blood' %}
+                                    <span class="badge badge-blood">Blood</span>
+                                    {% else %}
+                                    <span class="badge badge-both">Both</span>
+                                    {% endif %}
+                                </td>
+                                <td><strong style="color: var(--accent-red);">{{ donor.blood_group or '-' }}</strong>
+                                </td>
+                                <td>
+                                    {% if donor.is_available == 'yes' %}
+                                    <span style="color: var(--accent-green);">✓ Yes</span>
+                                    {% else %}
+                                    <span style="color: var(--accent-red);">✗ No</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size: 0.8rem;">{{ donor.created_at[:10] }}</td>
+                                <td>
+                                    <form method="POST" action="/admin/donors/delete/{{ donor.id }}"
+                                        style="display: inline;" onsubmit="return confirm('Delete this donor?');">
+                                        <button type="submit" class="btn btn-danger"
+                                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if blood_only_donors|length == 0 %}
+                <div class="text-center text-muted" style="padding: 3rem;">
+                    No blood donors registered yet.
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
+
+            <!-- Organ Donors Tab -->
+            <div id="tab-organ" class="tab-content">
+                <div class="flex" style="justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <p class="text-muted">Donors who pledged organs</p>
+                    <input type="text" id="searchOrgan" placeholder="Search organ donors..." style="max-width: 300px;"
+                        onkeyup="filterTable('tableOrgan', 'searchOrgan')">
+                </div>
+
+                <div class="table-container">
+                    <table class="donor-table" id="tableOrgan">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Area</th>
+                                <th>Type</th>
+                                <th>Organs</th>
+                                <th>Available</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donor in organ_only_donors %}
+                            <tr>
+                                <td>{{ donor.id }}</td>
+                                <td><strong>{{ donor.name }}</strong></td>
+                                <td>{{ donor.phone }}</td>
+                                <td>{{ donor.area or '-' }}</td>
+                                <td>
+                                    {% if donor.donor_type == 'organ' %}
+                                    <span class="badge badge-organ">Organ</span>
+                                    {% else %}
+                                    <span class="badge badge-both">Both</span>
+                                    {% endif %}
+                                </td>
+                                <td><strong style="color: var(--accent-primary);">{{ donor.organs or '-' }}</strong>
+                                </td>
+                                <td>
+                                    {% if donor.is_available == 'yes' %}
+                                    <span style="color: var(--accent-green);">✓ Yes</span>
+                                    {% else %}
+                                    <span style="color: var(--accent-red);">✗ No</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size: 0.8rem;">{{ donor.created_at[:10] }}</td>
+                                <td>
+                                    <form method="POST" action="/admin/donors/delete/{{ donor.id }}"
+                                        style="display: inline;" onsubmit="return confirm('Delete this donor?');">
+                                        <button type="submit" class="btn btn-danger"
+                                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if organ_only_donors|length == 0 %}
+                <div class="text-center text-muted" style="padding: 3rem;">
+                    No organ donors registered yet.
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function filterTable() {
-        const input = document.getElementById('searchInput');
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Show selected tab
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function filterTable(tableId, searchId) {
+        const input = document.getElementById(searchId);
         const filter = input.value.toUpperCase();
-        const table = document.getElementById('donorTable');
+        const table = document.getElementById(tableId);
         const rows = table.getElementsByTagName('tr');
 
         for (let i = 1; i < rows.length; i++) {
@@ -242,4 +389,71 @@
         }
     }
 </script>
+
+<!-- Donor Table Template for All Donors -->
+{% macro render_donor_table(donors, table_id) %}
+<div class="table-container">
+    <table class="donor-table" id="{{ table_id }}">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Area</th>
+                <th>Type</th>
+                <th>Blood Group</th>
+                <th>Available</th>
+                <th>Registered</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for donor in donors %}
+            <tr>
+                <td>{{ donor.id }}</td>
+                <td><strong>{{ donor.name }}</strong></td>
+                <td>{{ donor.phone }}</td>
+                <td>{{ donor.area or '-' }}</td>
+                <td>
+                    {% if donor.donor_type == 'blood' %}
+                    <span class="badge badge-blood">Blood</span>
+                    {% elif donor.donor_type == 'organ' %}
+                    <span class="badge badge-organ">Organ</span>
+                    {% else %}
+                    <span class="badge badge-both">Both</span>
+                    {% endif %}
+                </td>
+                <td>{{ donor.blood_group or '-' }}</td>
+                <td>
+                    {% if donor.is_available == 'yes' %}
+                    <span style="color: var(--accent-green);">✓ Yes</span>
+                    {% else %}
+                    <span style="color: var(--accent-red);">✗ No</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 0.8rem;">{{ donor.created_at[:10] }}</td>
+                <td>
+                    <form method="POST" action="/admin/donors/delete/{{ donor.id }}" style="display: inline;"
+                        onsubmit="return confirm('Delete this donor?');">
+                        <button type="submit" class="btn btn-danger"
+                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if donors|length == 0 %}
+<div class="text-center text-muted" style="padding: 3rem;">
+    No donors registered yet.
+</div>
+{% endif %}
+{% endmacro %}
+
+{{ render_donor_table(recent_donors, 'tableAll') }}
+
 {% endblock %}
