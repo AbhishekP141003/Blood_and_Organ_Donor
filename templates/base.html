@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CampusDonor{% endblock %}</title>
-    
+
     <style>
         /* ===== CSS VARIABLES & THEME ===== */
         :root {
@@ -13,59 +14,59 @@
             --bg-secondary: #f8fafc;
             --bg-gradient-start: #f4f7fb;
             --bg-gradient-end: #ffffff;
-            
+
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #64748b;
-            
+
             --border-color: #e2e8f0;
             --border-light: rgba(15, 23, 42, 0.04);
-            
+
             --card-bg: #ffffff;
             --card-shadow: rgba(15, 23, 42, 0.08);
-            
+
             --accent-primary: #06b6d4;
             --accent-secondary: #0ea5a5;
             --accent-red: #ef4444;
             --accent-green: #16a34a;
-            
+
             --input-bg: #fbfeff;
             --input-border: #e6eef6;
         }
-        
+
         /* Dark Mode Colors */
         [data-theme="dark"] {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-gradient-start: #0f172a;
             --bg-gradient-end: #1e293b;
-            
+
             --text-primary: #f1f5f9;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
-            
+
             --border-color: #334155;
             --border-light: rgba(241, 245, 249, 0.08);
-            
+
             --card-bg: #1e293b;
             --card-shadow: rgba(0, 0, 0, 0.3);
-            
+
             --accent-primary: #22d3ee;
             --accent-secondary: #14b8a6;
             --accent-red: #f87171;
             --accent-green: #22c55e;
-            
+
             --input-bg: #0f172a;
             --input-border: #334155;
         }
-        
+
         /* ===== GLOBAL STYLES ===== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
+
         body {
             font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
@@ -74,7 +75,7 @@
             transition: background 0.3s ease, color 0.3s ease;
             line-height: 1.6;
         }
-        
+
         /* ===== NAVIGATION ===== */
         .navbar {
             background: var(--card-bg);
@@ -86,7 +87,7 @@
             box-shadow: 0 2px 8px var(--card-shadow);
             transition: all 0.3s ease;
         }
-        
+
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -95,7 +96,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .nav-brand {
             display: flex;
             gap: 0.75rem;
@@ -105,7 +106,7 @@
             font-weight: 700;
             font-size: 1.25rem;
         }
-        
+
         .nav-logo {
             width: 40px;
             height: 40px;
@@ -117,14 +118,14 @@
             font-weight: bold;
             font-size: 1rem;
         }
-        
+
         .nav-links {
             display: flex;
             gap: 1.5rem;
             align-items: center;
             list-style: none;
         }
-        
+
         .nav-links a {
             text-decoration: none;
             color: var(--text-secondary);
@@ -132,11 +133,11 @@
             font-size: 0.9rem;
             transition: color 0.2s;
         }
-        
+
         .nav-links a:hover {
             color: var(--accent-primary);
         }
-        
+
         /* Theme Toggle Button */
         .theme-toggle {
             background: var(--bg-secondary);
@@ -147,13 +148,13 @@
             font-size: 1.2rem;
             transition: all 0.2s;
         }
-        
+
         .theme-toggle:hover {
             background: var(--accent-primary);
             border-color: var(--accent-primary);
             transform: scale(1.05);
         }
-        
+
         /* Mobile Menu Toggle */
         .mobile-menu-btn {
             display: none;
@@ -163,12 +164,12 @@
             color: var(--text-primary);
             cursor: pointer;
         }
-        
+
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
             }
-            
+
             .nav-links {
                 position: absolute;
                 top: 100%;
@@ -181,19 +182,19 @@
                 border-bottom: 1px solid var(--border-color);
                 display: none;
             }
-            
+
             .nav-links.active {
                 display: flex;
             }
         }
-        
+
         /* ===== CONTAINER ===== */
         .container {
             max-width: 1100px;
             margin: 2.5rem auto;
             padding: 1.5rem;
         }
-        
+
         /* ===== CARD ===== */
         .card {
             background: var(--card-bg);
@@ -203,11 +204,11 @@
             box-shadow: 0 12px 30px var(--card-shadow);
             transition: all 0.3s ease;
         }
-        
+
         .card:hover {
             box-shadow: 0 16px 40px var(--card-shadow);
         }
-        
+
         /* ===== BUTTONS ===== */
         .btn {
             padding: 0.75rem 1.25rem;
@@ -220,38 +221,38 @@
             display: inline-block;
             transition: all 0.2s ease;
         }
-        
+
         .btn-primary {
             background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             color: white;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
         }
-        
+
         .btn-outline {
             background: transparent;
             border: 2px solid var(--accent-primary);
             color: var(--accent-primary);
         }
-        
+
         .btn-outline:hover {
             background: var(--accent-primary);
             color: white;
         }
-        
+
         .btn-danger {
             background: var(--accent-red);
             color: white;
         }
-        
+
         .btn-success {
             background: var(--accent-green);
             color: white;
         }
-        
+
         /* ===== FORMS ===== */
         label {
             display: block;
@@ -260,7 +261,7 @@
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
         }
-        
+
         input[type="text"],
         input[type="email"],
         input[type="password"],
@@ -276,7 +277,7 @@
             font-size: 0.95rem;
             transition: all 0.2s;
         }
-        
+
         input:focus,
         select:focus,
         textarea:focus {
@@ -284,37 +285,96 @@
             border-color: var(--accent-primary);
             box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
         }
-        
+
         /* ===== UTILITY CLASSES ===== */
-        .text-center { text-align: center; }
-        .text-muted { color: var(--text-muted); }
-        .text-danger { color: var(--accent-red); }
-        .text-success { color: var(--accent-green); }
-        
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mt-3 { margin-top: 1.5rem; }
-        .mt-4 { margin-top: 2rem; }
-        
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
-        
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .gap-1 { gap: 0.5rem; }
-        .gap-2 { gap: 1rem; }
-        .gap-3 { gap: 1.5rem; }
-        
-        .grid { display: grid; }
-        .grid-2 { grid-template-columns: repeat(2, 1fr); }
-        .grid-3 { grid-template-columns: repeat(3, 1fr); }
-        
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        .text-center {
+            text-align: center;
         }
-        
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .text-danger {
+            color: var(--accent-red);
+        }
+
+        .text-success {
+            color: var(--accent-green);
+        }
+
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+
+        .mt-4 {
+            margin-top: 2rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 2rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .gap-2 {
+            gap: 1rem;
+        }
+
+        .gap-3 {
+            gap: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* ===== ALERTS ===== */
         .alert {
             padding: 1rem;
@@ -322,50 +382,57 @@
             margin-bottom: 1rem;
             border-left: 4px solid;
         }
-        
+
         .alert-error {
             background: #fef2f2;
             color: #991b1b;
             border-color: var(--accent-red);
         }
-        
+
         .alert-success {
             background: #f0fdf4;
             color: #166534;
             border-color: var(--accent-green);
         }
-        
+
         .alert-info {
             background: #eff6ff;
             color: #1e40af;
             border-color: #3b82f6;
         }
-        
+
         [data-theme="dark"] .alert-error {
             background: rgba(239, 68, 68, 0.1);
             color: #fca5a5;
         }
-        
+
         [data-theme="dark"] .alert-success {
             background: rgba(34, 197, 94, 0.1);
             color: #86efac;
         }
-        
+
         [data-theme="dark"] .alert-info {
             background: rgba(59, 130, 246, 0.1);
             color: #93c5fd;
         }
-        
+
         /* ===== ANIMATIONS ===== */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         .fade-in {
             animation: fadeIn 0.4s ease;
         }
-        
+
         /* ===== LOADING SPINNER ===== */
         .spinner {
             border: 3px solid var(--border-color);
@@ -376,15 +443,27 @@
             animation: spin 1s linear infinite;
             margin: 2rem auto;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
-        {% block extra_styles %}{% endblock %}
+
+            {
+            % block extra_styles %
+        }
+
+            {
+            % endblock %
+        }
     </style>
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
@@ -393,22 +472,22 @@
                 <div class="nav-logo">CD</div>
                 <span>CampusDonor</span>
             </a>
-            
+
             <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
-            
+
             <ul class="nav-links" id="navLinks">
                 <li><a href="/">Home</a></li>
                 <li><a href="/register">Register</a></li>
                 <li><a href="/search?type=blood">Search</a></li>
                 {% if session.get('admin_id') %}
-                    <li><a href="/admin/dashboard">Dashboard</a></li>
-                    <li><a href="/admin/logout">Logout</a></li>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/logout">Logout</a></li>
                 {% elif session.get('donor_id') %}
-                    <li><a href="/donor/profile">Profile</a></li>
-                    <li><a href="/donor/logout">Logout</a></li>
+                <li><a href="/donor/profile">Profile</a></li>
+                <li><a href="/donor/logout">Logout</a></li>
                 {% else %}
-                    <li><a href="/donor/login">Donor Login</a></li>
-                    <li><a href="/admin/login">Admin</a></li>
+                <li><a href="/donor/login">Donor Login</a></li>
+                <li><a href="/admin/login">Admin</a></li>
                 {% endif %}
                 <li>
                     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
@@ -431,30 +510,31 @@
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            
+
             // Update icon
             document.getElementById('themeIcon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
-        
+
         // Initialize theme from localStorage
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
         }
-        
+
         // Mobile menu toggle
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
         }
-        
+
         // Initialize theme on page load
         initTheme();
-        
-        {% block extra_scripts %}{% endblock %}
+
+        {% block extra_scripts %} {% endblock %}
     </script>
 </body>
+
 </html>
