@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Donor Login - CampusDonor{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class=" card" style="max-width: 500px; margin: 3rem auto;">
+        <div class="text-center mb-4">
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">👤 Donor Login</h1>
+            <p class="text-muted">Access and manage your donor profile</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/donor/login">
+            <div class="mb-3">
+                <label for="phone">Phone Number</label>
+                <div class="flex gap-2">
+                    <input type="text" id="phone" name="phone" placeholder="+919876543210" required style="flex: 1;">
+                    <button type="button" class="btn btn-outline" onclick="requestOTP()">Get OTP</button>
+                </div>
+                <small id="otpStatus" class="text-muted"></small>
+            </div>
+
+            <div class="mb-3">
+                <label for="otp">Enter OTP Code</label>
+                <input type="text" id="otp" name="otp" placeholder="xxxx" maxlength="4" required disabled>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Login to Profile
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <p class="text-muted" style="font-size: 0.9rem;">
+                Not registered yet? <a href="/register" style="color: var(--accent-primary);">Register as Donor</a>
+            </p>
+            <a href="/" style="color: var(--accent-primary); text-decoration: none; font-size: 0.9rem;">← Back to
+                Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function requestOTP() {
+        const phone = document.getElementById('phone').value.trim();
+        const otpInput = document.getElementById('otp');
+        const status = document.getElementById('otpStatus');
+
+        if (!phone || phone.length < 8) {
+            alert('Please enter a valid phone number');
+            return;
+        }
+
+        status.textContent = 'Requesting OTP...';
+        status.className = 'text-muted';
+
+        try {
+            const res = await fetch('/send_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: phone })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                status.textContent = '✅ OTP sent! Check server console.';
+                status.className = 'text-success';
+                otpInput.disabled = false;
+                otpInput.focus();
+            } else {
+                status.textContent = '❌ Error: ' + data.message;
+                status.className = 'text-danger';
+            }
+        } catch (e) {
+            console.error(e);
+            status.textContent = 'Network error';
+            status.className = 'text-danger';
+        }
+    }
+</script>
+{% endblock %}

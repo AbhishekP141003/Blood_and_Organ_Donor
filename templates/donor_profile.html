@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - CampusDonor{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .profile-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: var(--bg-secondary);
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-light);
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .availability-toggle {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 60px;
+        height: 30px;
+        background: #ccc;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+        background: var(--accent-green);
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 24px;
+        height: 24px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.3s;
+    }
+
+    .toggle-switch.active .toggle-slider {
+        transform: translateX(30px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card fade-in">
+        <div class="profile-header">
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">👤 {{ donor.name }}</h1>
+            <p style="opacity: 0.9;">Donor Profile</p>
+        </div>
+
+        <!-- Availability Toggle -->
+        <div class="availability-toggle mb-4">
+            <div style="flex: 1;">
+                <strong style="font-size: 1.1rem;">Availability Status</strong>
+                <p class="text-muted" style="font-size: 0.9rem; margin-top: 0.25rem;">
+                    Toggle your availability for donation requests
+                </p>
+            </div>
+            <div onclick="toggleAvailability()"
+                class="toggle-switch {% if donor.is_available == 'yes' %}active{% endif %}" id="availabilityToggle">
+                <div class="toggle-slider"></div>
+            </div>
+            <div>
+                <span id="statusText"
+                    style="font-weight: bold; color: {% if donor.is_available == 'yes' %}var(--accent-green){% else %}var(--accent-red){% endif %};">
+                    {% if donor.is_available == 'yes' %}Available{% else %}Unavailable{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Profile Information -->
+        <h3 class="mb-3">📋 Personal Information</h3>
+        <div class="profile-info">
+            <div class="info-item">
+                <div class="info-label">📧 Email</div>
+                <div class="info-value">{{ donor.email or 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">📞 Phone</div>
+                <div class="info-value">{{ donor.phone }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">📍 Area</div>
+                <div class="info-value">{{ donor.area or 'Not specified' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">🎯 Donor Type</div>
+                <div class="info-value">{{ donor.donor_type|title }}</div>
+            </div>
+            {% if donor.blood_group %}
+            <div class="info-item">
+                <div class="info-label">🩸 Blood Group</div>
+                <div class="info-value" style="color: var(--accent-red);">{{ donor.blood_group }}</div>
+            </div>
+            {% endif %}
+            {% if donor.organs %}
+            <div class="info-item">
+                <div class="info-label">🫀 Organs</div>
+                <div class="info-value">{{ donor.organs }}</div>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <div class="info-label">📅 Registered On</div>
+                <div class="info-value">{{ donor.created_at[:10] }}</div>
+            </div>
+            {% if donor.last_login %}
+            <div class="info-item">
+                <div class="info-label">🕐 Last Login</div>
+                <div class="info-value">{{ donor.last_login[:16] }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2 mt-4">
+            <a href="/donor/edit" class="btn btn-primary">✏️ Edit Profile</a>
+            <a href="/donor/logout" class="btn btn-outline">Logout</a>
+            <a href="/" class="btn btn-outline">← Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function toggleAvailability() {
+        const toggle = document.getElementById('availabilityToggle');
+        const statusText = document.getElementById('statusText');
+
+        try {
+            const res = await fetch('/donor/toggle_availability', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                if (data.new_status === 'yes') {
+                    toggle.classList.add('active');
+                    statusText.textContent = 'Available';
+                    statusText.style.color = 'var(--accent-green)';
+                } else {
+                    toggle.classList.remove('active');
+                    statusText.textContent = 'Unavailable';
+                    statusText.style.color = 'var(--accent-red)';
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error updating availability');
+        }
+    }
+</script>
+{% endblock %}

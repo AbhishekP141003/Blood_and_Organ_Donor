@@ -1,177 +1,244 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<title>CampusDonor — Search</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+{% extends "base.html" %}
+
+{% block title %}Search Donors - CampusDonor{% endblock %}
+
+{% block extra_styles %}
 <style>
-  /* Base Styles */
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Inter, sans-serif;background:linear-gradient(180deg,#f6fbff,#ffffff 40%);color:#0f1724;min-height:100vh}
-  .wrap{max-width:1100px;margin:36px auto;padding:20px}
-  .shell{background:#fff;border-radius:14px;padding:22px;border:1px solid rgba(12,18,28,0.04);box-shadow:0 16px 40px rgba(6,24,40,0.06)}
-  
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-  h1{font-size:20px;margin-bottom:4px}
-  
-  /* Security Box */
-  .security-box { background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-  .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-  .full-width { grid-column: span 2; }
-  
-  label { font-size: 13px; color: #475569; font-weight: 600; display: block; margin-bottom: 5px; }
-  input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; }
-  
-  /* Buttons */
-  .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; color: #fff; background: linear-gradient(90deg,#06b6d4,#0ea5a5); cursor: pointer; }
-  .btn-otp { background: #64748b; margin-left: -5px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
-  
-  /* Call Button Style (NEW) */
-  .btn-call { 
-    display: inline-block; 
-    text-decoration: none; 
-    background: #16a34a; /* Green */
-    color: white; 
-    padding: 8px 14px; 
-    border-radius: 6px; 
-    font-size: 13px; 
-    font-weight: bold;
-    margin-top: 5px;
+  .security-box {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fcd34d;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
   }
-  .btn-call:hover { background: #15803d; }
 
-  .input-group { display: flex; }
-  .input-group input { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+  [data-theme="dark"] .security-box {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(234, 179, 8, 0.2) 100%);
+    border-color: rgba(234, 179, 8, 0.3);
+  }
 
-  /* Results List */
-  .results-list { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
-  .item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 1px solid #f1f5f9; border-radius: 10px; margin-bottom: 10px; transition: transform 0.2s; }
-  .item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-  
-  .mask { font-family: monospace; background: #f1f5f9; padding: 4px 8px; border-radius: 6px; color: #334155; }
-  .badge { font-size: 12px; padding: 4px 8px; border-radius: 99px; background: #ecfeff; color: #06b6d4; font-weight: bold; }
-  .error-banner { background: #fef2f2; color: #991b1b; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fecaca; }
+  .input-group {
+    display: flex;
+  }
+
+  .input-group input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .btn-otp {
+    background: var(--text-secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .donor-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+  }
+
+  .donor-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--card-shadow);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .badge-blood {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .badge-organ {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  [data-theme="dark"] .badge-blood {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+  }
+
+  [data-theme="dark"] .badge-organ {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+  }
+
+  .phone-mask {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .btn-call {
+    background: var(--accent-green);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .btn-call:hover {
+    background: #15803d;
+  }
 </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="shell">
-      <header>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card fade-in">
+    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔍 Search {{ search_type|title }} Donors</h1>
+    <p class="text-muted mb-4">Find donors and get connected instantly</p>
+
+    {% if error_message %}
+    <div class="alert alert-error">
+      ⚠️ {{ error_message }}
+    </div>
+    {% endif %}
+
+    <form method="GET" action="/search">
+      <input type="hidden" name="type" value="{{ search_type }}">
+
+      <!-- Security Verification -->
+      <div class="security-box">
+        <h4 style="margin: 0 0 0.5rem 0; color: #92400e;">🔒 Identity Verification</h4>
+        <p style="font-size: 0.9rem; color: #78350f; margin-bottom: 1rem;">
+          Provide your details and verify your phone to search donors
+        </p>
+
+        <div class="grid grid-2 gap-3">
+          <div>
+            <label>Your Name</label>
+            <input type="text" name="seeker_name" required value="{{ request.args.get('seeker_name', '') }}"
+              placeholder="Your full name">
+          </div>
+          <div>
+            <label>Student / Staff ID</label>
+            <input type="text" name="seeker_id" required value="{{ request.args.get('seeker_id', '') }}"
+              placeholder="e.g. STU-2024">
+          </div>
+          <div>
+            <label>Mobile Number</label>
+            <div class="input-group">
+              <input type="text" id="phoneInput" name="seeker_phone" required
+                value="{{ request.args.get('seeker_phone', '') }}" placeholder="Your phone">
+              <button type="button" class="btn-otp" id="sendOtpBtn">Get OTP</button>
+            </div>
+            <small id="otpStatus" class="text-muted"></small>
+          </div>
+          <div>
+            <label>Enter OTP Code</label>
+            <input type="text" name="otp" id="otpInput" placeholder="xxxx" maxlength="4" required disabled>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Filters -->
+      <div class="grid grid-2 gap-3 mb-3">
         <div>
-          <h1>CampusDonor Security Check</h1>
-          <div style="color:#64748b; font-size:14px">Verify identity to view {{ search_type|title }} Donors</div>
-        </div>
-        <a href="/" style="color:#06b6d4;text-decoration:none;font-weight:700">← Home</a>
-      </header>
-
-      {% if error_message %}
-      <div class="error-banner">⚠️ {{ error_message }}</div>
-      {% endif %}
-
-      <form action="/search" method="GET">
-        <input type="hidden" name="type" value="{{ search_type }}">
-
-        <div class="security-box">
-          <h4 style="margin:0; color:#b45309;">🔒 Identity Verification</h4>
-          <p style="font-size:13px; color:#92400e; margin-bottom:15px;">You must provide your details and verify your phone to search.</p>
-          
-          <div class="grid-form">
-            <div>
-              <label>Your Name</label>
-              <input name="seeker_name" required value="{{ request.args.get('seeker_name', '') }}" placeholder="e.g. Rahul">
-            </div>
-            <div>
-              <label>Student / Staff ID</label>
-              <input name="seeker_id" required value="{{ request.args.get('seeker_id', '') }}" placeholder="e.g. STU-2024">
-            </div>
-            
-            <div>
-              <label>Mobile Number</label>
-              <div class="input-group">
-                <input type="text" id="phoneInput" name="seeker_phone" required value="{{ request.args.get('seeker_phone', '') }}" placeholder="Enter mobile">
-                <button type="button" class="btn btn-otp" id="sendOtpBtn">Get OTP</button>
-              </div>
-              <small id="otpStatus" style="font-size:12px; color:#64748b;"></small>
-            </div>
-            <div>
-              <label>Enter OTP Code</label>
-              <input type="text" name="otp" id="otpInput" placeholder="xxxx" maxlength="4" required disabled>
-            </div>
-          </div>
+          <label>Filter by Area (Optional)</label>
+          <input type="text" name="area" placeholder="e.g. North Campus" value="{{ request.args.get('area', '') }}">
         </div>
 
-        <div class="grid-form">
-          <div>
-            <label>Filter by Area (Optional)</label>
-            <input name="area" placeholder="e.g. North Campus" value="{{ request.args.get('area', '') }}">
-          </div>
-
-          {% if search_type == 'blood' %}
-          <div>
-            <label>Blood Group</label>
-            <select name="bg">
-              <option value="">Any</option>
-              {% for bg in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}
-                  <option value="{{ bg }}" {% if request.args.get('bg') == bg %}selected{% endif %}>{{ bg }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          {% endif %}
-
-          {% if search_type == 'organ' %}
-          <div>
-            <label>Select Organ Needed</label>
-            <select name="organ">
-              <option value="">Any Organ</option>
-              {% for organ in ['Kidney', 'Liver', 'Heart', 'Lungs', 'Cornea', 'Pancreas'] %}
-                <option value="{{ organ|lower }}" {% if request.args.get('organ') == organ|lower %}selected{% endif %}>{{ organ }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          {% endif %}
-          
-          <div class="full-width" style="margin-top:10px;">
-            <button type="submit" class="btn" style="width:100%">Verify & Search Donors</button>
-          </div>
+        {% if search_type == 'blood' %}
+        <div>
+          <label>Blood Group</label>
+          <select name="bg">
+            <option value="">Any</option>
+            {% for bg in ['A+','A-','B+','B-','AB+','AB-','O+','O-'] %}
+            <option value="{{ bg }}" {% if request.args.get('bg')==bg %}selected{% endif %}>
+              {{ bg }}
+            </option>
+            {% endfor %}
+          </select>
         </div>
-      </form>
-
-      {% if search_performed %}
-      <div class="results-list">
-        <h3>Results</h3>
-        {% if not donors %}
-          <div style="color:#64748b; padding:20px; text-align:center;">No donors found matching criteria.</div>
         {% endif %}
 
-        {% for d in donors %}
-        <div class="item">
+        {% if search_type == 'organ' %}
+        <div>
+          <label>Organ Needed</label>
+          <select name="organ">
+            <option value="">Any Organ</option>
+            {% for organ in ['kidney', 'liver', 'heart', 'lungs', 'cornea', 'pancreas'] %}
+            <option value="{{ organ }}" {% if request.args.get('organ')==organ %}selected{% endif %}>
+              {{ organ|title }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        🔍 Verify & Search Donors
+      </button>
+    </form>
+
+    <!-- Search Results -->
+    {% if search_performed %}
+    <hr style="border: none; height: 1px; background: var(--border-color); margin: 2rem 0;">
+
+    <h3 class="mb-3">Search Results ({{ donors|length }} found)</h3>
+
+    {% if donors|length == 0 %}
+    <div class="text-center text-muted" style="padding: 3rem;">
+      No donors found matching your criteria. Try adjusting your filters.
+    </div>
+    {% else %}
+    {% for donor in donors %}
+    <div class="donor-card">
+      <div class="flex" style="justify-content: space-between; align-items: flex-start; gap: 1rem;">
+        <div style="flex: 1;">
+          <h4 style="margin-bottom: 0.5rem; font-size: 1.25rem;">{{ donor.name }}</h4>
+          <p class="text-muted" style="margin-bottom: 0.75rem;">
+            📍 {{ donor.area or 'Location not specified' }}
+          </p>
           <div>
-            <div style="font-weight:700; font-size:16px;">{{ d.name }}</div>
-            <div style="color:#64748b; font-size:13px;">{{ d.area or 'Unknown Area' }}</div>
-            <div style="margin-top:5px;">
-              {% if d.donor_type in ['blood', 'both'] %}
-                <span class="badge">Blood: {{ d.blood_group }}</span>
-              {% endif %}
-              {% if d.donor_type in ['organ', 'both'] %}
-                <span class="badge" style="background:#f0fdf4; color:#16a34a;">Organ: {{ d.organs }}</span>
-              {% endif %}
-            </div>
-          </div>
-          
-          <div style="text-align:right" id="contact-action-{{ d.id }}">
-            <div class="mask">******{{ d.phone[-4:] }}</div>
-            <button class="btn" style="padding:6px 12px; margin-top:8px; font-size:13px;" 
-                    onclick="revealContact('{{ d.id }}', '{{ d.phone }}', '{{ d.email }}')">
-                Reveal
-            </button>
+            {% if donor.donor_type in ['blood', 'both'] %}
+            <span class="badge badge-blood">🩸 Blood: {{ donor.blood_group }}</span>
+            {% endif %}
+            {% if donor.donor_type in ['organ', 'both'] %}
+            <span class="badge badge-organ">🫀 Organs: {{ donor.organs }}</span>
+            {% endif %}
           </div>
         </div>
-        {% endfor %}
-      </div>
-      {% endif %}
 
+        <div style="text-align: right;" id="contact-{{ donor.id }}">
+          <div class="phone-mask">******{{ donor.phone[-4:] }}</div>
+          <button class="btn btn-primary" style="padding: 0.5rem 1rem; margin-top: 0.5rem; font-size: 0.9rem;"
+            onclick="revealContact('{{ donor.id }}', '{{ donor.phone }}', '{{ donor.email }}')">
+            Reveal Contact
+          </button>
+        </div>
+      </div>
     </div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
   </div>
+</div>
 
 <script>
   // OTP Logic
@@ -181,42 +248,50 @@
   const status = document.getElementById('otpStatus');
 
   sendBtn.addEventListener('click', async () => {
-      const phone = phoneIn.value.trim();
-      if(!phone || phone.length < 8) { alert("Enter valid phone"); return; }
-      
-      sendBtn.disabled = true;
-      status.textContent = "Requesting OTP...";
-      
-      try {
-          const res = await fetch('/send_otp', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({ phone: phone })
-          });
-          const data = await res.json();
-          if(data.success) {
-              status.style.color = 'green';
-              status.textContent = "OTP Sent! Check Server Console.";
-              otpIn.disabled = false;
-          } else {
-              status.style.color = 'red';
-              status.textContent = "Error sending OTP.";
-          }
-      } catch(e) { console.error(e); }
-      sendBtn.disabled = false;
+    const phone = phoneIn.value.trim();
+    if (!phone || phone.length < 8) {
+      alert('Enter valid phone number');
+      return;
+    }
+
+    sendBtn.disabled = true;
+    status.textContent = 'Requesting OTP...';
+    status.className = 'text-muted';
+
+    try {
+      const res = await fetch('/send_otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        status.textContent = '✅ OTP Sent! Check Server Console.';
+        status.className = 'text-success';
+        otpIn.disabled = false;
+        otpIn.focus();
+      } else {
+        status.textContent = '❌ Error sending OTP.';
+        status.className = 'text-danger';
+      }
+    } catch (e) {
+      console.error(e);
+      status.textContent = 'Network error';
+      status.className = 'text-danger';
+    }
+
+    sendBtn.disabled = false;
   });
 
-  // NEW: Reveal Contact with "Call Now" Button
+  // Reveal Contact
   function revealContact(id, phone, email) {
-    const container = document.getElementById('contact-action-' + id);
-    
-    // Inject HTML with Call Button
+    const container = document.getElementById('contact-' + id);
     container.innerHTML = `
-      <div style="font-weight:bold; color:#0f1724; font-size:14px; margin-bottom:4px;">${phone}</div>
-      <a href="tel:${phone}" class="btn-call">📞 Call Now</a>
-      ${email ? `<div style="font-size:12px; color:#64748b; margin-top:5px;">${email}</div>` : ''}
-    `;
+            <div style="font-weight: bold; font-size: 1.1rem; margin-bottom: 0.5rem;">${phone}</div>
+            <a href="tel:${phone}" class="btn-call">📞 Call Now</a>
+            ${email ? `<div class="text-muted" style="font-size: 0.9rem; margin-top: 0.5rem;">${email}</div>` : ''}
+        `;
   }
 </script>
-</body>
-</html>
+{% endblock %}

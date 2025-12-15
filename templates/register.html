@@ -1,147 +1,193 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CampusDonor — Register</title>
+{% extends "base.html" %}
+
+{% block title %}Register as Donor - CampusDonor{% endblock %}
+
+{% block extra_styles %}
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif;background:linear-gradient(180deg,#f4f7fb,#ffffff);color:#082032;min-height:100vh}
-  .wrap{max-width:980px;margin:36px auto;padding:20px}
-  .card{background:linear-gradient(180deg,#fff,#fbfeff);border-radius:14px;padding:22px;border:1px solid rgba(12,18,28,0.04);box-shadow:0 14px 30px rgba(6,24,40,0.06)}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  a.home{color:#0ea5a5;text-decoration:none;font-weight:600}
-  h1{font-size:20px;margin-bottom:6px}
-  p.lead{color:#475569;margin-bottom:14px}
-  form{display:grid;gap:12px}
-  .row{display:flex;gap:12px}
-  .col{flex:1}
-  label{font-size:13px;color:#334155}
-  input[type="text"],input[type="email"],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;background:#fbfeff;font-size:14px}
-  .muted{font-size:13px;color:#64748b}
-  .small{font-size:13px;color:#475569}
-  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;color:#fff;background:linear-gradient(90deg,#06b6d4,#0ea5a5)}
-  .btn.ghost{background:transparent;color:#0ea5a5;border:1px solid rgba(6,182,212,0.12)}
-  .toggle-box{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .pill{padding:8px 10px;border-radius:999px;background:#eef6f6;color:#034d4d;border:1px solid rgba(6,182,212,0.06);font-weight:600}
-  .field-help{font-size:12px;color:#94a3b8;margin-top:6px}
-  
-  /* OTP Specific Styles */
-  .input-group { display: flex; gap: 8px; }
-  .btn-otp { background: #475569; color: white; white-space: nowrap; border-radius: 8px; border:none; padding: 0 16px; cursor: pointer; }
-  .btn-otp:disabled { opacity: 0.6; cursor: not-allowed; }
-  .error-banner { background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #fecaca; }
+  .form-section {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px dashed var(--border-color);
+  }
 
-  @media(max-width:800px){ .row{flex-direction:column} }
+  .input-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .input-group input {
+    flex: 1;
+  }
+
+  .btn-otp {
+    background: var(--text-secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .btn-otp:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .field-help {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
 </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <header>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card fade-in" style="max-width: 900px; margin: 2rem auto;">
+    <div class="text-center mb-4">
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">✨ Register as Donor</h1>
+      <p class="text-muted">Join the life-saving community</p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-error">
+      ⚠️ {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/register" id="regForm">
+      <!-- Personal Information -->
+      <div class="grid grid-2 gap-3 mb-3">
         <div>
-          <a class="home" href="/">← Home</a>
-          <h1 id="pageTitle">Register as Donor</h1>
-          <div class="small">Register for Blood, Organ, or Both</div>
+          <label for="name">Full Name <span class="text-danger">*</span></label>
+          <input type="text" id="name" name="name" placeholder="John Doe" required>
         </div>
-        <div class="toggle-box">
-          <div class="pill">HopeBegins</div>
-        </div>
-      </header>
-
-      {% if error %}
-      <div class="error-banner">⚠️ {{ error }}</div>
-      {% endif %}
-
-      <p class="lead">Please fill accurate details. Mobile verification is required.</p>
-
-      <form action="/register" method="POST" id="regForm">
-        <div class="row">
-          <div class="col">
-            <label for="name">Full name <span style="color:#ef4444">*</span></label>
-            <input id="name" name="name" type="text" placeholder="e.g., John" required />
-          </div>
-          <div class="col">
-            <label for="email">Email (optional)</label>
-            <input id="email" name="email" type="email" placeholder="you@example.com" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label for="phone">Phone Verification <span style="color:#ef4444">*</span></label>
-            <div class="input-group">
-                <input id="phone" name="phone" type="text" placeholder="+9198xxxxxxxx" required />
-                <button type="button" class="btn-otp" id="getOtpBtn">Get OTP</button>
-            </div>
-            <div class="field-help" id="otpStatus">Enter number and click Get OTP.</div>
-          </div>
-          <div class="col">
-            <label for="otp">Enter OTP Code <span style="color:#ef4444">*</span></label>
-            <input id="otp" name="otp" type="text" placeholder="xxxx" required disabled style="background-color: #f1f5f9;" />
-          </div>
-        </div>
-
         <div>
-          <label for="area">Address</label>
-          <input id="area" name="area" type="text" placeholder="Address / Campus Area" />
+          <label for="email">Email (optional)</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com">
         </div>
+      </div>
 
+      <!-- Phone Verification -->
+      <div class="grid grid-2 gap-3 mb-3">
         <div>
-          <label for="donorType">Register as <span style="color:#ef4444">*</span></label>
-          <select id="donorType" name="donor_type" required>
-            <option value="">Select type</option>
-            <option value="blood">Blood donor</option>
-            <option value="organ">Organ donor</option>
-            <option value="both">Both (blood & organ)</option>
-          </select>
+          <label for="phone">Phone Verification <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <input type="text" id="phone" name="phone" placeholder="+919876543210" required>
+            <button type="button" class="btn-otp" id="getOtpBtn">Get OTP</button>
+          </div>
+          <div class="field-help" id="otpStatus">Enter phone and click Get OTP</div>
         </div>
+        <div>
+          <label for="otp">Enter OTP Code <span class="text-danger">*</span></label>
+          <input type="text" id="otp" name="otp" placeholder="xxxx" maxlength="4" required disabled>
+        </div>
+      </div>
 
-        <div id="bloodBlock" style="display:none; margin-top:6px; padding:12px; border-radius:10px; border:1px dashed rgba(6,182,212,0.08); background:linear-gradient(180deg,#fbfeff,#f8ffff)">
-          <label for="bloodGroup">Blood group <span style="color:#ef4444">*</span></label>
-          <select id="bloodGroup" name="blood_group">
-            <option value="">Select blood group</option>
-            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
-          </select>
+      <div class="mb-3">
+        <label for="area">Address / Campus Area</label>
+        <input type="text" id="area" name="area" placeholder="North Campus, Block A">
+      </div>
 
-          <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-            <label style="margin-right:6px">Availability now?</label>
-            <select id="bloodAvailable" name="blood_available" style="width:150px">
+      <!-- Donor Type -->
+      <div class="mb-3">
+        <label for="donorType">Register as <span class="text-danger">*</span></label>
+        <select id="donorType" name="donor_type" required>
+          <option value="">Select type</option>
+          <option value="blood">Blood Donor</option>
+          <option value="organ">Organ Donor</option>
+          <option value="both">Both (Blood & Organ)</option>
+        </select>
+      </div>
+
+      <!-- Blood Donor Fields -->
+      <div id="bloodBlock" class="form-section" style="display: none;">
+        <h4 style="margin-bottom: 1rem; color: var(--accent-red);">🩸 Blood Donation Details</h4>
+
+        <div class="grid grid-2 gap-3">
+          <div>
+            <label for="bloodGroup">Blood Group <span class="text-danger">*</span></label>
+            <select id="bloodGroup" name="blood_group">
+              <option value="">Select blood group</option>
+              <option>A+</option>
+              <option>A-</option>
+              <option>B+</option>
+              <option>B-</option>
+              <option>AB+</option>
+              <option>AB-</option>
+              <option>O+</option>
+              <option>O-</option>
+            </select>
+          </div>
+          <div>
+            <label for="bloodAvailable">Currently Available?</label>
+            <select id="bloodAvailable" name="blood_available">
               <option value="yes">Yes</option>
               <option value="no">No</option>
             </select>
           </div>
         </div>
+      </div>
 
-        <div id="organBlock" style="display:none; margin-top:12px; padding:12px; border-radius:10px; border:1px dashed rgba(6,182,212,0.08); background:linear-gradient(180deg,#fff,#fbfeff)">
-          <label for="organList">Organs willing to donate <span style="color:#ef4444">*</span></label>
-          <select id="organList" name="organs" multiple style="width:100%;height:110px;margin-top:8px;border-radius:8px;border:1px solid #e6eef6;background:#fbfeff">
-            <option value="kidney">Kidney</option>
-            <option value="liver">Liver</option>
-            <option value="heart">Heart</option>
-            <option value="lungs">Lungs</option>
-            <option value="cornea">Cornea</option>
-            <option value="pancreas">Pancreas</option>
-          </select>
+      <!-- Organ Donor Fields -->
+      <div id="organBlock" class="form-section" style="display: none;">
+        <h4 style="margin-bottom: 1rem; color: #3b82f6;">🫀 Organ Donation Details</h4>
 
-          <div style="margin-top:10px">
-            <input id="consent" type="checkbox" /> <label for="consent" class="small">I hereby consent to be an organ donor</label>
-          </div>
+        <label>Organs Willing to Donate <span class="text-danger">*</span></label>
+        <div
+          style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 0.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="kidney">
+            <span style="font-weight: normal;">Kidney</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="liver">
+            <span style="font-weight: normal;">Liver</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="heart">
+            <span style="font-weight: normal;">Heart</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="lungs">
+            <span style="font-weight: normal;">Lungs</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="cornea">
+            <span style="font-weight: normal;">Cornea</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="organs" value="pancreas">
+            <span style="font-weight: normal;">Pancreas</span>
+          </label>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-top:10px">
-          <button class="btn" type="submit">Submit Registration</button>
-          <button type="reset" class="btn ghost">Reset</button>
+        <div class="mt-2">
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" id="consent">
+            <span style="font-weight: normal;">I hereby consent to be an organ donor</span>
+          </label>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">💾 Submit Registration</button>
+        <button type="reset" class="btn btn-outline">Reset</button>
+        <a href="/" class="btn btn-outline">← Home</a>
+      </div>
+    </form>
   </div>
+</div>
 
 <script>
   const el = id => document.getElementById(id);
-  
-  // --- OTP Logic ---
+
+  // OTP Logic
   const otpBtn = el('getOtpBtn');
   const otpInput = el('otp');
   const phoneInput = el('phone');
@@ -149,43 +195,42 @@
 
   otpBtn.addEventListener('click', async () => {
     const phone = phoneInput.value.trim();
-    if(phone.length < 8) {
-        alert("Please enter a valid phone number first.");
-        return;
+    if (phone.length < 8) {
+      alert('Please enter a valid phone number');
+      return;
     }
 
     otpBtn.disabled = true;
-    otpStatus.textContent = "Requesting OTP...";
-    otpStatus.style.color = "#475569";
+    otpStatus.textContent = 'Requesting OTP...';
+    otpStatus.className = 'field-help';
 
     try {
-        const res = await fetch('/send_otp', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ phone: phone })
-        });
-        const data = await res.json();
+      const res = await fetch('/send_otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone })
+      });
+      const data = await res.json();
 
-        if(data.success) {
-            otpStatus.textContent = "✅ OTP Sent! Check server console.";
-            otpStatus.style.color = "green";
-            otpInput.disabled = false;
-            otpInput.style.backgroundColor = "#fff";
-            otpInput.focus();
-        } else {
-            otpStatus.textContent = "❌ Error: " + data.message;
-            otpStatus.style.color = "red";
-            otpBtn.disabled = false;
-        }
-    } catch(e) {
-        console.error(e);
-        otpStatus.textContent = "Network Error.";
+      if (data.success) {
+        otpStatus.textContent = '✅ OTP Sent! Check server console.';
+        otpStatus.className = 'field-help text-success';
+        otpInput.disabled = false;
+        otpInput.focus();
+      } else {
+        otpStatus.textContent = '❌ Error: ' + data.message;
+        otpStatus.className = 'field-help text-danger';
         otpBtn.disabled = false;
+      }
+    } catch (e) {
+      console.error(e);
+      otpStatus.textContent = 'Network Error';
+      otpStatus.className = 'field-help text-danger';
+      otpBtn.disabled = false;
     }
   });
 
-
-  // --- UI Logic (Show/Hide fields) ---
+  // Donor Type Logic
   el('donorType').addEventListener('change', (e) => {
     const v = e.target.value;
     const isBlood = (v === 'blood' || v === 'both');
@@ -194,11 +239,8 @@
     el('bloodBlock').style.display = isBlood ? 'block' : 'none';
     el('organBlock').style.display = isOrgan ? 'block' : 'none';
 
-    // Sync required attributes for form validation
     el('bloodGroup').required = isBlood;
-    el('organList').required = isOrgan;
     el('consent').required = isOrgan;
   });
 </script>
-</body>
-</html>
+{% endblock %}
