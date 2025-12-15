@@ -23,6 +23,15 @@ EMAIL_PASSWORD = 'your-app-password'     # Change this (use App Password for Gma
 
 def send_otp_email(recipient_email, otp_code, recipient_name=""):
     """Send OTP via email"""
+    # Check if email is configured
+    if EMAIL_ADDRESS == 'your-email@gmail.com' or EMAIL_PASSWORD == 'your-app-password':
+        print(f"\n⚠️  EMAIL NOT CONFIGURED!")
+        print(f"========================================")
+        print(f" [CONSOLE MODE] OTP for {recipient_email}: {otp_code}")
+        print(f"========================================\n")
+        print("To enable email sending, configure EMAIL_ADDRESS and EMAIL_PASSWORD in app.py")
+        return False
+    
     try:
         # Create message
         msg = MIMEMultipart('alternative')
@@ -69,7 +78,8 @@ def send_otp_email(recipient_email, otp_code, recipient_name=""):
         print(f"❌ Error sending email: {str(e)}")
         # Fallback: print to console
         print(f"\n========================================")
-        print(f" [CONSOLE FALLBACK] OTP for {recipient_email}: {otp_code}")
+        print(f" [EMAIL FAILED - CONSOLE FALLBACK] OTP: {otp_code}")
+        print(f" For: {recipient_email}")
         print(f"========================================\n")
         return False
 
