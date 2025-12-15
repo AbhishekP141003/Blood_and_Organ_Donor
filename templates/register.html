@@ -1,17 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Register as Donor - CampusDonor{% endblock %}
+{% block title %}Register as Blood Donor - CampusBloodDonor{% endblock %}
 
 {% block extra_styles %}
 <style>
-  .form-section {
-    background: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    border: 1px dashed var(--border-color);
-  }
-
   .input-group {
     display: flex;
     gap: 0.5rem;
@@ -47,9 +39,9 @@
 
 {% block content %}
 <div class="container">
-  <div class="card fade-in" style="max-width: 900px; margin: 2rem auto;">
+  <div class="card fade-in" style="max-width: 700px; margin: 2rem auto;">
     <div class="text-center mb-4">
-      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">✨ Register as Donor</h1>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">✨ Register as Blood Donor</h1>
       <p class="text-muted">Join the life-saving community</p>
     </div>
 
@@ -59,7 +51,7 @@
     </div>
     {% endif %}
 
-    <form method="POST" action="/register" id="regForm">
+    <form method="POST" action="/register">
       <!-- Personal Information -->
       <div class="grid grid-2 gap-3 mb-3">
         <div>
@@ -93,84 +85,28 @@
         <input type="text" id="area" name="area" placeholder="North Campus, Block A">
       </div>
 
-      <!-- Donor Type -->
-      <div class="mb-3">
-        <label for="donorType">Register as <span class="text-danger">*</span></label>
-        <select id="donorType" name="donor_type" required>
-          <option value="">Select type</option>
-          <option value="blood">Blood Donor</option>
-          <option value="organ">Organ Donor</option>
-          <option value="both">Both (Blood & Organ)</option>
-        </select>
-      </div>
-
-      <!-- Blood Donor Fields -->
-      <div id="bloodBlock" class="form-section" style="display: none;">
-        <h4 style="margin-bottom: 1rem; color: var(--accent-red);">🩸 Blood Donation Details</h4>
-
-        <div class="grid grid-2 gap-3">
-          <div>
-            <label for="bloodGroup">Blood Group <span class="text-danger">*</span></label>
-            <select id="bloodGroup" name="blood_group">
-              <option value="">Select blood group</option>
-              <option>A+</option>
-              <option>A-</option>
-              <option>B+</option>
-              <option>B-</option>
-              <option>AB+</option>
-              <option>AB-</option>
-              <option>O+</option>
-              <option>O-</option>
-            </select>
-          </div>
-          <div>
-            <label for="bloodAvailable">Currently Available?</label>
-            <select id="bloodAvailable" name="blood_available">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
+      <!-- Blood Group -->
+      <div class="grid grid-2 gap-3 mb-3">
+        <div>
+          <label for="bloodGroup">Blood Group <span class="text-danger">*</span></label>
+          <select id="bloodGroup" name="blood_group" required>
+            <option value="">Select blood group</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+            <option>O+</option>
+            <option>O-</option>
+          </select>
         </div>
-      </div>
-
-      <!-- Organ Donor Fields -->
-      <div id="organBlock" class="form-section" style="display: none;">
-        <h4 style="margin-bottom: 1rem; color: #3b82f6;">🫀 Organ Donation Details</h4>
-
-        <label>Organs Willing to Donate <span class="text-danger">*</span></label>
-        <div
-          style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 0.5rem;">
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="kidney">
-            <span style="font-weight: normal;">Kidney</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="liver">
-            <span style="font-weight: normal;">Liver</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="heart">
-            <span style="font-weight: normal;">Heart</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="lungs">
-            <span style="font-weight: normal;">Lungs</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="cornea">
-            <span style="font-weight: normal;">Cornea</span>
-          </label>
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-            <input type="checkbox" name="organs" value="pancreas">
-            <span style="font-weight: normal;">Pancreas</span>
-          </label>
-        </div>
-
-        <div class="mt-2">
-          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-            <input type="checkbox" id="consent">
-            <span style="font-weight: normal;">I hereby consent to be an organ donor</span>
-          </label>
+        <div>
+          <label for="bloodAvailable">Currently Available?</label>
+          <select id="bloodAvailable" name="blood_available">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
         </div>
       </div>
 
@@ -228,19 +164,6 @@
       otpStatus.className = 'field-help text-danger';
       otpBtn.disabled = false;
     }
-  });
-
-  // Donor Type Logic
-  el('donorType').addEventListener('change', (e) => {
-    const v = e.target.value;
-    const isBlood = (v === 'blood' || v === 'both');
-    const isOrgan = (v === 'organ' || v === 'both');
-
-    el('bloodBlock').style.display = isBlood ? 'block' : 'none';
-    el('organBlock').style.display = isOrgan ? 'block' : 'none';
-
-    el('bloodGroup').required = isBlood;
-    el('consent').required = isOrgan;
   });
 </script>
 {% endblock %}

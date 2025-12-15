@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Profile - CampusDonor{% endblock %}
+{% block title %}Edit Profile - CampusBloodDonor{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="card fade-in" style="max-width: 800px; margin: 2rem auto;">
+    <div class="card fade-in" style="max-width: 700px; margin: 2rem auto;">
         <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">✏️ Edit Your Profile</h1>
-        <p class="text-muted mb-4">Update your donor information</p>
+        <p class="text-muted mb-4">Update your blood donor information</p>
 
         {% if error %}
         <div class="alert alert-error">
@@ -32,54 +32,21 @@
                     placeholder="Campus area or location">
             </div>
 
-            <div class="mb-3">
-                <label for="donor_type">Donor Type <span style="color: var(--accent-red);">*</span></label>
-                <select id="donor_type" name="donor_type" required onchange="updateDonorFields()">
-                    <option value="blood" {% if donor.donor_type=='blood' %}selected{% endif %}>Blood Donor</option>
-                    <option value="organ" {% if donor.donor_type=='organ' %}selected{% endif %}>Organ Donor</option>
-                    <option value="both" {% if donor.donor_type=='both' %}selected{% endif %}>Both</option>
-                </select>
-            </div>
-
-            <!-- Blood Donor Fields -->
-            <div id="bloodFields"
-                style="display: none; background: var(--bg-secondary); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem;">
-                <h4 style="margin-bottom: 1rem; color: var(--accent-red);">🩸 Blood Donation Details</h4>
-                <div class="grid grid-2 gap-3">
-                    <div>
-                        <label for="blood_group">Blood Group <span style="color: var(--accent-red);">*</span></label>
-                        <select id="blood_group" name="blood_group">
-                            {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
-                            <option value="{{ bg }}" {% if donor.blood_group==bg %}selected{% endif %}>{{ bg }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="blood_available">Currently Available?</label>
-                        <select id="blood_available" name="blood_available">
-                            <option value="yes" {% if donor.blood_available=='yes' %}selected{% endif %}>Yes</option>
-                            <option value="no" {% if donor.blood_available=='no' %}selected{% endif %}>No</option>
-                        </select>
-                    </div>
+            <div class="grid grid-2 gap-3 mb-3">
+                <div>
+                    <label for="blood_group">Blood Group <span style="color: var(--accent-red);">*</span></label>
+                    <select id="blood_group" name="blood_group" required>
+                        {% for bg in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                        <option value="{{ bg }}" {% if donor.blood_group==bg %}selected{% endif %}>{{ bg }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </div>
-
-            <!-- Organ Donor Fields -->
-            <div id="organFields"
-                style="display: none; background: var(--bg-secondary); padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem;">
-                <h4 style="margin-bottom: 1rem; color: #3b82f6;">🫀 Organ Donation Details</h4>
-                <label>Organs Willing to Donate <span style="color: var(--accent-red);">*</span></label>
-                <div
-                    style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
-                    {% set selected_organs = (donor.organs or '').split(',') %}
-                    {% for organ in ['kidney', 'liver', 'heart', 'lungs', 'cornea', 'pancreas'] %}
-                    <label
-                        style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; cursor: pointer;">
-                        <input type="checkbox" name="organs" value="{{ organ }}" {% if organ in selected_organs
-                            %}checked{% endif %}>
-                        <span style="font-weight: normal;">{{ organ|title }}</span>
-                    </label>
-                    {% endfor %}
+                <div>
+                    <label for="blood_available">Currently Available?</label>
+                    <select id="blood_available" name="blood_available">
+                        <option value="yes" {% if donor.blood_available=='yes' %}selected{% endif %}>Yes</option>
+                        <option value="no" {% if donor.blood_available=='no' %}selected{% endif %}>No</option>
+                    </select>
                 </div>
             </div>
 
@@ -90,30 +57,4 @@
         </form>
     </div>
 </div>
-
-<script>
-    function updateDonorFields() {
-        const type = document.getElementById('donor_type').value;
-        const bloodFields = document.getElementById('bloodFields');
-        const organFields = document.getElementById('organFields');
-        const bloodGroup = document.getElementById('blood_group');
-
-        if (type === 'blood' || type === 'both') {
-            bloodFields.style.display = 'block';
-            bloodGroup.required = true;
-        } else {
-            bloodFields.style.display = 'none';
-            bloodGroup.required = false;
-        }
-
-        if (type === 'organ' || type === 'both') {
-            organFields.style.display = 'block';
-        } else {
-            organFields.style.display = 'none';
-        }
-    }
-
-    // Initialize on page load
-    updateDonorFields();
-</script>
 {% endblock %}

@@ -469,8 +469,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="nav-brand">
-                <div class="nav-logo">CD</div>
-                <span>CampusDonor</span>
+                <div class="nav-logo">CB</div>
+                <span>CampusBloodDonor</span>
             </a>
 
             <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
@@ -478,7 +478,7 @@
             <ul class="nav-links" id="navLinks">
                 <li><a href="/">Home</a></li>
                 <li><a href="/register">Register</a></li>
-                <li><a href="/search?type=blood">Search</a></li>
+                <li><a href="/search">Search Donors</a></li>
                 {% if session.get('admin_id') %}
                 <li><a href="/admin/dashboard">Dashboard</a></li>
                 <li><a href="/admin/logout">Logout</a></li>

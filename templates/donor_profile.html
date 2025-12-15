@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}My Profile - CampusDonor{% endblock %}
+{% block title %}My Profile - CampusBloodDonor{% endblock %}
 
 {% block extra_styles %}
 <style>
     .profile-header {
-        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        background: linear-gradient(135deg, #ef4444, #f87171);
         color: white;
         padding: 2rem;
         border-radius: 12px;
@@ -85,8 +85,8 @@
 <div class="container">
     <div class="card fade-in">
         <div class="profile-header">
-            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">👤 {{ donor.name }}</h1>
-            <p style="opacity: 0.9;">Donor Profile</p>
+            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🩸 {{ donor.name }}</h1>
+            <p style="opacity: 0.9;">Blood Donor Profile</p>
         </div>
 
         <!-- Availability Toggle -->
@@ -125,21 +125,9 @@
                 <div class="info-value">{{ donor.area or 'Not specified' }}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">🎯 Donor Type</div>
-                <div class="info-value">{{ donor.donor_type|title }}</div>
-            </div>
-            {% if donor.blood_group %}
-            <div class="info-item">
                 <div class="info-label">🩸 Blood Group</div>
                 <div class="info-value" style="color: var(--accent-red);">{{ donor.blood_group }}</div>
             </div>
-            {% endif %}
-            {% if donor.organs %}
-            <div class="info-item">
-                <div class="info-label">🫀 Organs</div>
-                <div class="info-value">{{ donor.organs }}</div>
-            </div>
-            {% endif %}
             <div class="info-item">
                 <div class="info-label">📅 Registered On</div>
                 <div class="info-value">{{ donor.created_at[:10] }}</div>

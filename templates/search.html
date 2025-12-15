@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Search Donors - CampusDonor{% endblock %}
+{% block title %}Search Blood Donors - CampusBloodDonor{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -52,33 +52,19 @@
     box-shadow: 0 8px 20px var(--card-shadow);
   }
 
-  .badge {
+  .badge-blood {
     display: inline-block;
     padding: 0.35rem 0.75rem;
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-right: 0.5rem;
-  }
-
-  .badge-blood {
     background: #fee2e2;
     color: #991b1b;
-  }
-
-  .badge-organ {
-    background: #dbeafe;
-    color: #1e40af;
   }
 
   [data-theme="dark"] .badge-blood {
     background: rgba(239, 68, 68, 0.2);
     color: #fca5a5;
-  }
-
-  [data-theme="dark"] .badge-organ {
-    background: rgba(59, 130, 246, 0.2);
-    color: #93c5fd;
   }
 
   .phone-mask {
@@ -97,7 +83,6 @@
     text-decoration: none;
     display: inline-block;
     font-weight: 600;
-    margin-top: 0.5rem;
   }
 
   .btn-call:hover {
@@ -109,8 +94,8 @@
 {% block content %}
 <div class="container">
   <div class="card fade-in">
-    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔍 Search {{ search_type|title }} Donors</h1>
-    <p class="text-muted mb-4">Find donors and get connected instantly</p>
+    <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔍 Search Blood Donors</h1>
+    <p class="text-muted mb-4">Find blood donors and get connected instantly</p>
 
     {% if error_message %}
     <div class="alert alert-error">
@@ -119,8 +104,6 @@
     {% endif %}
 
     <form method="GET" action="/search">
-      <input type="hidden" name="type" value="{{ search_type }}">
-
       <!-- Security Verification -->
       <div class="security-box">
         <h4 style="margin: 0 0 0.5rem 0; color: #92400e;">🔒 Identity Verification</h4>
@@ -162,7 +145,6 @@
           <input type="text" name="area" placeholder="e.g. North Campus" value="{{ request.args.get('area', '') }}">
         </div>
 
-        {% if search_type == 'blood' %}
         <div>
           <label>Blood Group</label>
           <select name="bg">
@@ -174,21 +156,6 @@
             {% endfor %}
           </select>
         </div>
-        {% endif %}
-
-        {% if search_type == 'organ' %}
-        <div>
-          <label>Organ Needed</label>
-          <select name="organ">
-            <option value="">Any Organ</option>
-            {% for organ in ['kidney', 'liver', 'heart', 'lungs', 'cornea', 'pancreas'] %}
-            <option value="{{ organ }}" {% if request.args.get('organ')==organ %}selected{% endif %}>
-              {{ organ|title }}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
-        {% endif %}
       </div>
 
       <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -216,12 +183,7 @@
             📍 {{ donor.area or 'Location not specified' }}
           </p>
           <div>
-            {% if donor.donor_type in ['blood', 'both'] %}
-            <span class="badge badge-blood">🩸 Blood: {{ donor.blood_group }}</span>
-            {% endif %}
-            {% if donor.donor_type in ['organ', 'both'] %}
-            <span class="badge badge-organ">🫀 Organs: {{ donor.organs }}</span>
-            {% endif %}
+            <span class="badge-blood">🩸 Blood Group: {{ donor.blood_group }}</span>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}CampusDonor - Campus Blood & Organ Donor Network{% endblock %}
+{% block title %}CampusBloodDonor - Campus Blood Donor Network{% endblock %}
 
 {% block extra_styles %}
 <style>
@@ -49,22 +49,11 @@
     text-align: center;
     padding: 1.25rem;
     border-radius: 10px;
-  }
-
-  .stat-box.blood {
     background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
   }
 
-  .stat-box.organ {
-    background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
-  }
-
-  [data-theme="dark"] .stat-box.blood {
+  [data-theme="dark"] .stat-box {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%);
-  }
-
-  [data-theme="dark"] .stat-box.organ {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.25) 100%);
   }
 
   .stat-number {
@@ -72,12 +61,18 @@
     font-weight: bold;
     line-height: 1;
     display: block;
+    color: #ef4444;
   }
 
   .stat-label {
     font-size: 0.9rem;
     font-weight: 600;
     margin-top: 0.5rem;
+    color: #991b1b;
+  }
+
+  [data-theme="dark"] .stat-label {
+    color: #fca5a5;
   }
 
   .info-grid {
@@ -106,6 +101,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: #ef4444;
   }
 
   .info-card p {
@@ -120,20 +116,19 @@
   <div class="card fade-in">
     <section class="hero">
       <div>
-        <h2 class="hero-title">Save Lives within your Campus 🏥</h2>
+        <h2 class="hero-title">Save Lives within your Campus 🩸</h2>
         <p class="hero-subtitle">
-          CampusDonor helps students and staff register as blood & organ donors.
+          CampusBloodDonor helps students and staff register as blood donors.
           Connect with donors instantly during emergencies.
         </p>
 
         <div class="flex gap-2" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
-          <a href="/register" class="btn btn-primary">✨ Register as Donor</a>
+          <a href="/register" class="btn btn-primary">✨ Register as Blood Donor</a>
           <a href="/donor/login" class="btn btn-outline">👤 Donor Login</a>
         </div>
 
-        <div class="flex gap-2" style="flex-wrap: wrap;">
-          <a href="/search?type=blood" class="btn btn-outline">🩸 Search Blood</a>
-          <a href="/search?type=organ" class="btn btn-outline">🫀 Search Organ</a>
+        <div>
+          <a href="/search" class="btn btn-outline">🩸 Search Blood Donors</a>
         </div>
       </div>
 
@@ -142,13 +137,9 @@
         <p class="text-muted" style="font-size: 0.9rem;">Real-time database availability</p>
 
         <div class="impact-stats">
-          <div class="stat-box blood">
-            <span class="stat-number" style="color: #ef4444;">{{ blood_count }}</span>
-            <div class="stat-label" style="color: #991b1b;">Blood Donors</div>
-          </div>
-          <div class="stat-box organ">
-            <span class="stat-number" style="color: #06b6d4;">{{ organ_count }}</span>
-            <div class="stat-label" style="color: #0e7490;">Organ Pledges</div>
+          <div class="stat-box">
+            <span class="stat-number">{{ blood_count }}</span>
+            <div class="stat-label">Blood Donors</div>
           </div>
         </div>
       </div>
@@ -157,27 +148,31 @@
     <hr style="border: none; height: 1px; background: var(--border-color); margin: 3rem 0;">
 
     <section>
-      <h3 style="font-size: 1.75rem; margin-bottom: 1.5rem; text-align: center;">Why It Matters</h3>
+      <h3 style="font-size: 1.75rem; margin-bottom: 1.5rem; text-align: center;">Why Blood Donation Matters</h3>
 
       <div class="info-grid">
         <div class="info-card">
-          <h4 style="color: #ef4444;">🩸 Blood Donation</h4>
+          <h4>🩸 Life-Saving Impact</h4>
           <p>
             Blood cannot be manufactured; it can only come from generous donors.
             <strong>One donation can save up to 3 lives</strong>.
-            Donated blood is vital for surgeries, cancer treatments, chronic illnesses, and traumatic injuries.
-            The process is safe, quick, and makes a direct impact on your campus community.
+            Your blood is vital for surgeries, cancer treatments, chronic illnesses, and emergencies.
           </p>
         </div>
 
         <div class="info-card">
-          <h4 style="color: #06b6d4;">🫀 Organ Donation</h4>
+          <h4>⚡ Fast & Safe</h4>
           <p>
-            Registering as an organ donor is a powerful legacy.
-            <strong>One donor can save up to 8 lives</strong> and improve the lives of over 75 others through tissue
-            donation.
-            There is a critical gap between the number of organs needed and those available.
-            Your pledge today gives hope to thousands waiting for a second chance at life.
+            The donation process is safe, quick, and makes a direct impact on your campus community.
+            Healthy adults can donate every 12 weeks, and each donation takes about 10-15 minutes.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h4>🎯 Campus Community</h4>
+          <p>
+            Help your fellow students and staff during medical emergencies.
+            Build a trusted network of blood donors within your campus for faster response times.
           </p>
         </div>
       </div>

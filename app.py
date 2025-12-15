@@ -29,7 +29,7 @@ def init_db():
     with app.app_context():
         db = get_db()
         
-        # Donors Table - Enhanced
+        # Donors Table - Blood Donors Only
         db.execute('''
             CREATE TABLE IF NOT EXISTS donors (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,10 +37,8 @@ def init_db():
                 email TEXT,
                 phone TEXT NOT NULL UNIQUE,
                 area TEXT,
-                donor_type TEXT NOT NULL,
-                blood_group TEXT,
+                blood_group TEXT NOT NULL,
                 blood_available TEXT DEFAULT 'yes',
-                organs TEXT,
                 is_available TEXT DEFAULT 'yes',
                 last_login DATETIME,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -54,7 +52,6 @@ def init_db():
                 seeker_name TEXT,
                 seeker_id TEXT,
                 seeker_phone TEXT,
-                search_type TEXT,
                 criteria TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
@@ -101,14 +98,10 @@ def home():
     db = get_db()
     
     # Count Blood Donors
-    res_blood = db.execute("SELECT COUNT(*) FROM donors WHERE donor_type IN ('blood', 'both')").fetchone()
+    res_blood = db.execute("SELECT COUNT(*) FROM donors").fetchone()
     blood_count = res_blood[0] if res_blood else 0
     
-    # Count Organ Donors
-    res_organ = db.execute("SELECT COUNT(*) FROM donors WHERE donor_type IN ('organ', 'both')").fetchone()
-    organ_count = res_organ[0] if res_organ else 0
-    
-    return render_template('index.html', blood_count=blood_count, organ_count=organ_count)
+    return render_template('index.html', blood_count=blood_count)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -134,19 +127,14 @@ def register():
             name = request.form.get('name')
             email = request.form.get('email')
             area = request.form.get('area')
-            donor_type = request.form.get('donor_type')
-            
-            blood_group = request.form.get('blood_group') if donor_type in ['blood', 'both'] else None
-            blood_available = request.form.get('blood_available') if donor_type in ['blood', 'both'] else 'yes'
-            
-            organs_list = request.form.getlist('organs')
-            organs_str = ",".join(organs_list) if donor_type in ['organ', 'both'] else None
+            blood_group = request.form.get('blood_group')
+            blood_available = request.form.get('blood_available', 'yes')
             
             try:
                 db.execute('''
-                    INSERT INTO donors (name, email, phone, area, donor_type, blood_group, blood_available, organs)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (name, email, phone, area, donor_type, blood_group, blood_available, organs_str))
+                    INSERT INTO donors (name, email, phone, area, blood_group, blood_available)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (name, email, phone, area, blood_group, blood_available))
                 db.commit()
                 
                 # Clear OTP
@@ -185,7 +173,6 @@ def send_otp():
 def search():
     db = get_db()
     
-    search_type = request.args.get('type', 'blood')
     seeker_name = request.args.get('seeker_name', '').strip()
     seeker_id = request.args.get('seeker_id', '').strip()
     seeker_phone = request.args.get('seeker_phone', '').strip()
@@ -212,21 +199,17 @@ def search():
             
             # Log search
             criteria = f"Area: {area_filter}, BG: {bg_filter}"
-            db.execute('INSERT INTO search_logs (seeker_name, seeker_id, seeker_phone, search_type, criteria) VALUES (?, ?, ?, ?, ?)',
-                       (seeker_name, seeker_id, seeker_phone, search_type, criteria))
+            db.execute('INSERT INTO search_logs (seeker_name, seeker_id, seeker_phone, criteria) VALUES (?, ?, ?, ?)',
+                       (seeker_name, seeker_id, seeker_phone, criteria))
             db.commit()
             
             # Query donors
             query = "SELECT * FROM donors WHERE is_available = 'yes' AND 1=1"
             params = []
             
-            if search_type == 'blood':
-                query += " AND (donor_type = 'blood' OR donor_type = 'both')"
-                if bg_filter:
-                    query += " AND blood_group = ?"
-                    params.append(bg_filter)
-            elif search_type == 'organ':
-                query += " AND (donor_type = 'organ' OR donor_type = 'both')"
+            if bg_filter:
+                query += " AND blood_group = ?"
+                params.append(bg_filter)
             
             if area_filter:
                 query += " AND lower(area) LIKE ?"
@@ -237,7 +220,6 @@ def search():
     
     return render_template('search.html', 
                            donors=donors, 
-                           search_type=search_type, 
                            search_performed=search_performed,
                            error_message=error_message)
 
@@ -271,43 +253,23 @@ def admin_dashboard():
     
     # Statistics
     total_donors = db.execute("SELECT COUNT(*) FROM donors").fetchone()[0]
-    blood_donors = db.execute("SELECT COUNT(*) FROM donors WHERE donor_type IN ('blood', 'both')").fetchone()[0]
-    organ_donors = db.execute("SELECT COUNT(*) FROM donors WHERE donor_type IN ('organ', 'both')").fetchone()[0]
     total_searches = db.execute("SELECT COUNT(*) FROM search_logs").fetchone()[0]
     
-    # Recent donors (all)
-    recent_donors = db.execute("SELECT * FROM donors ORDER BY created_at DESC LIMIT 50").fetchall()
-    
-    # Separate lists for blood and organ donors
-    blood_only_donors = db.execute("""
-        SELECT * FROM donors 
-        WHERE donor_type IN ('blood', 'both') 
-        ORDER BY created_at DESC
-    """).fetchall()
-    
-    organ_only_donors = db.execute("""
-        SELECT * FROM donors 
-        WHERE donor_type IN ('organ', 'both') 
-        ORDER BY created_at DESC
-    """).fetchall()
+    # All donors
+    all_donors = db.execute("SELECT * FROM donors ORDER BY created_at DESC").fetchall()
     
     # Blood group distribution
     blood_distribution = db.execute("""
         SELECT blood_group, COUNT(*) as count 
         FROM donors 
-        WHERE blood_group IS NOT NULL 
         GROUP BY blood_group
         ORDER BY count DESC
     """).fetchall()
     
     return render_template('admin_dashboard.html',
                            total_donors=total_donors,
-                           blood_donors=blood_donors,
-                           organ_donors=organ_donors,
                            total_searches=total_searches,
-                           recent_donors=recent_donors,
-                           blood_only_donors=blood_only_donors,
-                           organ_only_donors=organ_only_donors,
+                           all_donors=all_donors,
                            blood_distribution=blood_distribution)
 
 @app.route('/admin/donors/delete/<int:donor_id>', methods=['POST'])
@@ -329,19 +291,19 @@ def admin_export_csv():
     writer = csv.writer(output)
     
     # Header
-    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Area', 'Donor Type', 'Blood Group', 'Available', 'Organs', 'Created At'])
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Area', 'Blood Group', 'Available', 'Created At'])
     
     # Data
     for donor in donors:
         writer.writerow([
             donor['id'], donor['name'], donor['email'], donor['phone'],
-            donor['area'], donor['donor_type'], donor['blood_group'],
-            donor['is_available'], donor['organs'], donor['created_at']
+            donor['area'], donor['blood_group'],
+            donor['is_available'], donor['created_at']
         ])
     
     # Create response
     response = make_response(output.getvalue())
-    response.headers["Content-Disposition"] = f"attachment; filename=donors_{datetime.now().strftime('%Y%m%d')}.csv"
+    response.headers["Content-Disposition"] = f"attachment; filename=blood_donors_{datetime.now().strftime('%Y%m%d')}.csv"
     response.headers["Content-type"] = "text/csv"
     
     return response
@@ -409,20 +371,14 @@ def donor_edit():
         name = request.form.get('name')
         email = request.form.get('email')
         area = request.form.get('area')
-        donor_type = request.form.get('donor_type')
-        
-        blood_group = request.form.get('blood_group') if donor_type in ['blood', 'both'] else None
-        blood_available = request.form.get('blood_available') if donor_type in ['blood', 'both'] else 'yes'
-        
-        organs_list = request.form.getlist('organs')
-        organs_str = ",".join(organs_list) if donor_type in ['organ', 'both'] else None
+        blood_group = request.form.get('blood_group')
+        blood_available = request.form.get('blood_available', 'yes')
         
         db.execute('''
             UPDATE donors 
-            SET name = ?, email = ?, area = ?, donor_type = ?, 
-                blood_group = ?, blood_available = ?, organs = ?
+            SET name = ?, email = ?, area = ?, blood_group = ?, blood_available = ?
             WHERE id = ?
-        ''', (name, email, area, donor_type, blood_group, blood_available, organs_str, session['donor_id']))
+        ''', (name, email, area, blood_group, blood_available, session['donor_id']))
         db.commit()
         
         return redirect(url_for('donor_profile'))
