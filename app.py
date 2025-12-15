@@ -2,6 +2,9 @@ import sqlite3
 import random
 import csv
 import io
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from functools import wraps
 from flask import Flask, render_template, request, g, redirect, url_for, session, jsonify, make_response
@@ -10,6 +13,65 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = 'campus_secret_key_123_change_in_production'
 DB_NAME = "campus_donor.db"
+
+# ===== EMAIL CONFIGURATION =====
+# Configure these with your email credentials
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_ADDRESS = 'your-email@gmail.com'  # Change this
+EMAIL_PASSWORD = 'your-app-password'     # Change this (use App Password for Gmail)
+
+def send_otp_email(recipient_email, otp_code, recipient_name=""):
+    """Send OTP via email"""
+    try:
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f'Your CampusBloodDonor OTP: {otp_code}'
+        msg['From'] = EMAIL_ADDRESS
+        msg['To'] = recipient_email
+        
+        # HTML email body
+        html_body = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <h2 style="color: #ef4444;">🩸 CampusBloodDonor</h2>
+                    <p>Hello {recipient_name or 'there'},</p>
+                    <p>Your One-Time Password (OTP) for verification is:</p>
+                    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                        <h1 style="color: #ef4444; font-size: 32px; margin: 0; letter-spacing: 5px;">{otp_code}</h1>
+                    </div>
+                    <p><strong>This OTP is valid for 10 minutes.</strong></p>
+                    <p>If you didn't request this OTP, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #666;">
+                        CampusBloodDonor - Connecting blood donors within your campus community
+                    </p>
+                </div>
+            </body>
+        </html>
+        """
+        
+        # Attach HTML body
+        msg.attach(MIMEText(html_body, 'html'))
+        
+        # Send email
+        server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        print(f"✅ OTP sent successfully to {recipient_email}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error sending email: {str(e)}")
+        # Fallback: print to console
+        print(f"\n========================================")
+        print(f" [CONSOLE FALLBACK] OTP for {recipient_email}: {otp_code}")
+        print(f"========================================\n")
+        return False
 
 # ===== DATABASE HELPER FUNCTIONS =====
 def get_db():
@@ -29,12 +91,12 @@ def init_db():
     with app.app_context():
         db = get_db()
         
-        # Donors Table - Blood Donors Only
+        # Donors Table - Blood Donors Only (Email now required)
         db.execute('''
             CREATE TABLE IF NOT EXISTS donors (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                email TEXT,
+                email TEXT NOT NULL,
                 phone TEXT NOT NULL UNIQUE,
                 area TEXT,
                 blood_group TEXT NOT NULL,
@@ -110,22 +172,22 @@ def register():
     if request.method == 'POST':
         # Verify OTP
         user_otp = request.form.get('otp')
-        phone = request.form.get('phone')
+        email = request.form.get('email')
         
         server_otp = session.get('current_otp')
-        server_phone = session.get('otp_phone')
+        server_email = session.get('otp_email')
         
         if not server_otp or not user_otp:
             error_message = "OTP verification is required."
         elif user_otp != server_otp:
             error_message = "Invalid OTP code."
-        elif phone != server_phone:
-            error_message = "Phone number changed after OTP was sent."
+        elif email != server_email:
+            error_message = "Email changed after OTP was sent."
         else:
             # Save to Database
             db = get_db()
             name = request.form.get('name')
-            email = request.form.get('email')
+            phone = request.form.get('phone')
             area = request.form.get('area')
             blood_group = request.form.get('blood_group')
             blood_available = request.form.get('blood_available', 'yes')
@@ -139,7 +201,7 @@ def register():
                 
                 # Clear OTP
                 session.pop('current_otp', None)
-                session.pop('otp_phone', None)
+                session.pop('otp_email', None)
                 
                 return redirect(url_for('home', success=1))
             except sqlite3.IntegrityError:
@@ -150,24 +212,30 @@ def register():
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
     data = request.json
-    phone = data.get('phone')
+    email = data.get('email')
+    name = data.get('name', '')
     
-    if not phone:
-        return jsonify({'success': False, 'message': 'Phone number required'})
+    if not email:
+        return jsonify({'success': False, 'message': 'Email address required'})
+    
+    # Validate email format
+    if '@' not in email or '.' not in email:
+        return jsonify({'success': False, 'message': 'Invalid email format'})
     
     # Generate 4-digit OTP
     otp_code = str(random.randint(1000, 9999))
     
     # Store in session
     session['current_otp'] = otp_code
-    session['otp_phone'] = phone
+    session['otp_email'] = email
     
-    # SIMULATION: Print to console
-    print(f"\n========================================")
-    print(f" [SMS GATEWAY] OTP for {phone}: {otp_code}")
-    print(f"========================================\n")
+    # Send OTP via email
+    email_sent = send_otp_email(email, otp_code, name)
     
-    return jsonify({'success': True, 'message': 'OTP sent (check server console)'})
+    if email_sent:
+        return jsonify({'success': True, 'message': f'OTP sent to {email}'})
+    else:
+        return jsonify({'success': True, 'message': 'OTP sent (check console if email failed)'})
 
 @app.route('/search')
 def search():
@@ -187,12 +255,9 @@ def search():
     
     if seeker_name and seeker_id and seeker_phone and user_otp:
         server_otp = session.get('current_otp')
-        server_phone = session.get('otp_phone')
         
         if not server_otp or user_otp != server_otp:
             error_message = "Invalid or expired OTP."
-        elif seeker_phone != server_phone:
-            error_message = "Phone number changed after OTP generation."
         else:
             search_performed = True
             session.pop('current_otp', None)
@@ -322,25 +387,25 @@ def donor_login():
     
     error = None
     if request.method == 'POST':
-        phone = request.form.get('phone')
+        email = request.form.get('email')
         otp = request.form.get('otp')
         
         server_otp = session.get('current_otp')
-        server_phone = session.get('otp_phone')
+        server_email = session.get('otp_email')
         
         if not server_otp or otp != server_otp:
             error = "Invalid OTP"
-        elif phone != server_phone:
-            error = "Phone number mismatch"
+        elif email != server_email:
+            error = "Email mismatch"
         else:
             db = get_db()
-            donor = db.execute("SELECT * FROM donors WHERE phone = ?", (phone,)).fetchone()
+            donor = db.execute("SELECT * FROM donors WHERE email = ?", (email,)).fetchone()
             
             if donor:
                 session['donor_id'] = donor['id']
                 session['donor_name'] = donor['name']
                 session.pop('current_otp', None)
-                session.pop('otp_phone', None)
+                session.pop('otp_email', None)
                 
                 # Update last login
                 db.execute("UPDATE donors SET last_login = ? WHERE id = ?", 
@@ -349,7 +414,7 @@ def donor_login():
                 
                 return redirect(url_for('donor_profile'))
             else:
-                error = "No donor found with this phone number"
+                error = "No donor found with this email address"
     
     return render_template('donor_login.html', error=error)
 

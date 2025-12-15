@@ -1,13 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}Donor Login - CampusDonor{% endblock %}
+{% block title %}Donor Login - CampusBloodDonor{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .login-box {
+        max-width: 500px;
+        margin: 3rem auto;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-group input {
+        flex: 1;
+    }
+
+    .btn-otp {
+        background: var(--text-secondary);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .btn-otp:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class=" card" style="max-width: 500px; margin: 3rem auto;">
+    <div class="card fade-in login-box">
         <div class="text-center mb-4">
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">👤 Donor Login</h1>
-            <p class="text-muted">Access and manage your donor profile</p>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🩸 Donor Login</h1>
+            <p class="text-muted">Access your blood donor profile</p>
         </div>
 
         {% if error %}
@@ -18,70 +52,83 @@
 
         <form method="POST" action="/donor/login">
             <div class="mb-3">
-                <label for="phone">Phone Number</label>
-                <div class="flex gap-2">
-                    <input type="text" id="phone" name="phone" placeholder="+919876543210" required style="flex: 1;">
-                    <button type="button" class="btn btn-outline" onclick="requestOTP()">Get OTP</button>
+                <label for="email">Email Address <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                    <button type="button" class="btn-otp" id="sendOtpBtn">Get OTP</button>
                 </div>
-                <small id="otpStatus" class="text-muted"></small>
+                <small id="otpStatus" class="text-muted" style="display: block; margin-top: 0.5rem;">
+                    Enter your registered email address
+                </small>
             </div>
 
             <div class="mb-3">
-                <label for="otp">Enter OTP Code</label>
-                <input type="text" id="otp" name="otp" placeholder="xxxx" maxlength="4" required disabled>
+                <label for="otp">Enter OTP Code <span class="text-danger">*</span></label>
+                <input type="text" id="otp" name="otp" placeholder="Enter 4-digit OTP" maxlength="4" required disabled>
+                <small class="text-muted" style="display: block; margin-top: 0.5rem;">
+                    Check your email for the OTP code
+                </small>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                Login to Profile
-            </button>
+            <div class="flex gap-2">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Login</button>
+                <a href="/" class="btn btn-outline">Cancel</a>
+            </div>
         </form>
 
-        <div class="text-center mt-3">
-            <p class="text-muted" style="font-size: 0.9rem;">
-                Not registered yet? <a href="/register" style="color: var(--accent-primary);">Register as Donor</a>
-            </p>
-            <a href="/" style="color: var(--accent-primary); text-decoration: none; font-size: 0.9rem;">← Back to
-                Home</a>
+        <div class="text-center mt-4">
+            <p class="text-muted">Don't have an account?</p>
+            <a href="/register" class="btn btn-outline" style="margin-top: 0.5rem;">Register as Donor</a>
         </div>
     </div>
 </div>
 
 <script>
-    async function requestOTP() {
-        const phone = document.getElementById('phone').value.trim();
-        const otpInput = document.getElementById('otp');
-        const status = document.getElementById('otpStatus');
+    const sendBtn = document.getElementById('sendOtpBtn');
+    const emailInput = document.getElementById('email');
+    const otpInput = document.getElementById('otp');
+    const status = document.getElementById('otpStatus');
 
-        if (!phone || phone.length < 8) {
-            alert('Please enter a valid phone number');
+    sendBtn.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+            alert('Please enter a valid email address');
             return;
         }
 
-        status.textContent = 'Requesting OTP...';
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
+        status.textContent = 'Sending OTP to your email...';
         status.className = 'text-muted';
 
         try {
             const res = await fetch('/send_otp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: phone })
+                body: JSON.stringify({ email: email })
             });
             const data = await res.json();
 
             if (data.success) {
-                status.textContent = '✅ OTP sent! Check server console.';
+                status.textContent = `✅ ${data.message}`;
                 status.className = 'text-success';
                 otpInput.disabled = false;
                 otpInput.focus();
+                sendBtn.textContent = 'Resend OTP';
+                setTimeout(() => { sendBtn.disabled = false; }, 30000); // Allow resend after 30s
             } else {
-                status.textContent = '❌ Error: ' + data.message;
+                status.textContent = '❌ ' + data.message;
                 status.className = 'text-danger';
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Get OTP';
             }
         } catch (e) {
             console.error(e);
-            status.textContent = 'Network error';
+            status.textContent = '❌ Network error';
             status.className = 'text-danger';
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'Get OTP';
         }
-    }
+    });
 </script>
 {% endblock %}
