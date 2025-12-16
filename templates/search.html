@@ -233,7 +233,7 @@
       const data = await res.json();
 
       if (data.success) {
-        status.textContent = `✅ ${data.message} Check your inbox!`;
+        status.textContent = `✅ ${data.message} Check spam or inbox`;
         status.className = 'text-success';
         otpIn.disabled = false;
         otpIn.focus();
