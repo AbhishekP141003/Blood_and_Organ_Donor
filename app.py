@@ -133,17 +133,18 @@ def init_db():
         db.execute('''
             CREATE TABLE IF NOT EXISTS admins (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL UNIQUE,
                 password_hash TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         
         # Create default admin if not exists
-        admin_exists = db.execute("SELECT * FROM admins WHERE username = 'admin'").fetchone()
+        admin_exists = db.execute("SELECT * FROM admins WHERE email = 'abhip141003@gmail.com'").fetchone()
         if not admin_exists:
-            hashed_pw = generate_password_hash('admin123')
-            db.execute("INSERT INTO admins (username, password_hash) VALUES (?, ?)", ('admin', hashed_pw))
+            hashed_pw = generate_password_hash('Abhi@Engineering')
+            db.execute("INSERT INTO admins (email, password_hash) VALUES (?, ?)", 
+                      ('abhip141003@gmail.com', hashed_pw))
         
         db.commit()
 
@@ -306,18 +307,18 @@ def admin_login():
     
     error = None
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
         
         db = get_db()
-        admin = db.execute("SELECT * FROM admins WHERE username = ?", (username,)).fetchone()
+        admin = db.execute("SELECT * FROM admins WHERE email = ?", (email,)).fetchone()
         
         if admin and check_password_hash(admin['password_hash'], password):
             session['admin_id'] = admin['id']
-            session['admin_username'] = admin['username']
+            session['admin_email'] = admin['email']
             return redirect(url_for('admin_dashboard'))
         else:
-            error = "Invalid username or password"
+            error = "Invalid email or password"
     
     return render_template('admin_login.html', error=error)
 
@@ -345,7 +346,8 @@ def admin_dashboard():
                            total_donors=total_donors,
                            total_searches=total_searches,
                            all_donors=all_donors,
-                           blood_distribution=blood_distribution)
+                           blood_distribution=blood_distribution,
+                           admin_email=session.get('admin_email'))
 
 @app.route('/admin/donors/delete/<int:donor_id>', methods=['POST'])
 @admin_required
@@ -386,7 +388,7 @@ def admin_export_csv():
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('admin_id', None)
-    session.pop('admin_username', None)
+    session.pop('admin_email', None)
     return redirect(url_for('home'))
 
 # ===== DONOR ROUTES =====
