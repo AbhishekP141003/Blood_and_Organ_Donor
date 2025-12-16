@@ -74,18 +74,24 @@ def send_otp_email(recipient_email, otp_code, recipient_name=""):
         # Attach HTML body
         msg.attach(MIMEText(html_body, 'html'))
         
-        # Send email
-        server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.send_message(msg)
-        server.quit()
-        
-        print(f"✅ OTP sent successfully to {recipient_email}")
-        return True
+        # Send email with timeout to prevent hanging
+        try:
+            server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=10)
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(msg)
+            server.quit()
+            
+            print(f"✅ OTP sent successfully to {recipient_email}")
+            return True
+        except smtplib.SMTPException as smtp_error:
+            print(f"❌ SMTP Error: {str(smtp_error)}")
+            raise  # Re-raise to be caught by outer exception
         
     except Exception as e:
         print(f"❌ Error sending email: {str(e)}")
+        import traceback
+        traceback.print_exc()
         # Fallback: print to console
         print(f"\n========================================")
         print(f" [EMAIL FAILED - CONSOLE FALLBACK] OTP: {otp_code}")
