@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Successful - CampusBloodDonor{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .success-container {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .success-card {
+        max-width: 600px;
+        text-align: center;
+    }
+
+    .success-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .success-title {
+        font-size: 2rem;
+        color: var(--accent-green);
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .success-message {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.8;
+    }
+
+    .home-button {
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        background: linear-gradient(90deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+    }
+
+    .home-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+    }
+
+    .checkmark-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+        animation: scaleIn 0.5s ease;
+    }
+
+    .checkmark {
+        font-size: 4rem;
+        color: white;
+    }
+
+    .info-box {
+        background: var(--bg-secondary);
+        border-left: 4px solid var(--accent-primary);
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-top: 2rem;
+        text-align: left;
+    }
+
+    .info-box h4 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: var(--accent-primary);
+    }
+
+    .info-box ul {
+        margin-left: 1.5rem;
+        color: var(--text-secondary);
+    }
+
+    .info-box li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="card success-card fade-in">
+        <div class="checkmark-circle">
+            <div class="checkmark">✓</div>
+        </div>
+
+        <h1 class="success-title">Successfully Registered as Donor!</h1>
+
+        <p class="success-message">
+            Thank you for joining our life-saving community! Your information has been successfully registered
+            in our donor database. You can now help save lives in emergency situations.
+        </p>
+
+        <a href="/" class="home-button">🏠 Go to Home</a>
+
+        <div class="info-box">
+            <h4>📋 What's Next?</h4>
+            <ul>
+                <li>You can log in to your donor profile anytime to update your availability</li>
+                <li>Keep your contact information up to date</li>
+                <li>You may be contacted when someone needs your blood group</li>
+                <li>Stay healthy and ready to donate!</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

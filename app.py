@@ -211,11 +211,15 @@ def register():
                 session.pop('current_otp', None)
                 session.pop('otp_email', None)
                 
-                return redirect(url_for('home', success=1))
+                return redirect(url_for('registration_success'))
             except sqlite3.IntegrityError:
                 error_message = "This phone number is already registered."
     
     return render_template('register.html', error=error_message)
+
+@app.route('/registration_success')
+def registration_success():
+    return render_template('registration_success.html')
 
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
