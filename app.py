@@ -2,10 +2,7 @@ import sqlite3
 import random
 import csv
 import io
-import smtplib
 import os
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from functools import wraps
 from flask import Flask, render_template, request, g, redirect, url_for, session, jsonify, make_response
@@ -15,86 +12,70 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'campus_secret_key_123_change_in_production')
 DB_NAME = "campus_donor.db"
 
-# ===== EMAIL CONFIGURATION =====
-# Configure these with your email credentials or environment variables
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS', 'abhip141003@gmail.com')
-EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'nfldldhiikvbjmgi')     # Gmail App Password configured
+# ===== SENDGRID EMAIL CONFIGURATION =====
+# SendGrid is more reliable than Gmail SMTP for production deployments
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
+FROM_EMAIL = os.environ.get('FROM_EMAIL', 'abhip141003@gmail.com')
 
-# IMPORTANT: To get your Gmail App Password:
-# 1. Go to: https://myaccount.google.com/security
-# 2. Enable "2-Step Verification" (if not already enabled)
-# 3. Go to: https://myaccount.google.com/apppasswords
-# 4. Select "Mail" and "Other (Custom name)"
-# 5. Name it "CampusBloodDonor" and Generate
-# 6. Copy the 16-character password (looks like: xxxx xxxx xxxx xxxx)
-# 7. Paste it above replacing 'your-app-password' (remove spaces)
-
+# ===== OTP EMAIL FUNCTION =====
 def send_otp_email(recipient_email, otp_code, recipient_name=""):
-    """Send OTP via email"""
-    # Check if email is configured
-    if EMAIL_ADDRESS == 'your-email@gmail.com' or EMAIL_PASSWORD == 'your-app-password':
-        print(f"\n⚠️  EMAIL NOT CONFIGURED!")
-        print(f"========================================")
-        print(f" [CONSOLE MODE] OTP for {recipient_email}: {otp_code}")
+    """Send OTP via SendGrid email service"""
+    
+    # If SendGrid is not configured, print to console (development mode)
+    if not SENDGRID_API_KEY:
+        print(f"\n========================================")
+        print(f" [SENDGRID NOT CONFIGURED - CONSOLE MODE]")
+        print(f" OTP for {recipient_email}: {otp_code}")
         print(f"========================================\n")
-        print("To enable email sending, configure EMAIL_ADDRESS and EMAIL_PASSWORD in app.py")
+        print("To enable email: Set SENDGRID_API_KEY environment variable")
+        print("Get your key at: https://app.sendgrid.com/settings/api_keys")
         return False
     
     try:
-        # Create message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f'Your CampusBloodDonor OTP: {otp_code}'
-        msg['From'] = EMAIL_ADDRESS
-        msg['To'] = recipient_email
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail, Email, To, Content
         
-        # HTML email body
-        html_body = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                    <h2 style="color: #ef4444;">🩸 CampusBloodDonor</h2>
-                    <p>Hello {recipient_name or 'there'},</p>
-                    <p>Your One-Time Password (OTP) for verification is:</p>
-                    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                        <h1 style="color: #ef4444; font-size: 32px; margin: 0; letter-spacing: 5px;">{otp_code}</h1>
+        # Create email message
+        message = Mail(
+            from_email=Email(FROM_EMAIL),
+            to_emails=To(recipient_email),
+            subject=f'Your CampusBloodDonor OTP: {otp_code}',
+            html_content=f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                        <h2 style="color: #ef4444;">🩸 CampusBloodDonor</h2>
+                        <p>Hello {recipient_name or 'there'},</p>
+                        <p>Your One-Time Password (OTP) for verification is:</p>
+                        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+                            <h1 style="color: #ef4444; font-size: 32px; margin: 0; letter-spacing: 5px;">{otp_code}</h1>
+                        </div>
+                        <p><strong>This OTP is valid for 10 minutes.</strong></p>
+                        <p>If you didn't request this OTP, please ignore this email.</p>
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #666;">
+                            CampusBloodDonor - Connecting blood donors within your campus community
+                        </p>
                     </div>
-                    <p><strong>This OTP is valid for 10 minutes.</strong></p>
-                    <p>If you didn't request this OTP, please ignore this email.</p>
-                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #666;">
-                        CampusBloodDonor - Connecting blood donors within your campus community
-                    </p>
-                </div>
-            </body>
-        </html>
-        """
+                </body>
+            </html>
+            """)
         
-        # Attach HTML body
-        msg.attach(MIMEText(html_body, 'html'))
+        # Send email via SendGrid
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
         
-        # Send email with timeout to prevent hanging
-        try:
-            server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT, timeout=10)
-            server.starttls()
-            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-            server.send_message(msg)
-            server.quit()
-            
-            print(f"✅ OTP sent successfully to {recipient_email}")
-            return True
-        except smtplib.SMTPException as smtp_error:
-            print(f"❌ SMTP Error: {str(smtp_error)}")
-            raise  # Re-raise to be caught by outer exception
+        print(f"✅ OTP sent successfully to {recipient_email} via SendGrid (Status: {response.status_code})")
+        return True
         
     except Exception as e:
-        print(f"❌ Error sending email: {str(e)}")
+        print(f"❌ SendGrid Error: {str(e)}")
         import traceback
         traceback.print_exc()
         # Fallback: print to console
         print(f"\n========================================")
-        print(f" [EMAIL FAILED - CONSOLE FALLBACK] OTP: {otp_code}")
+        print(f" [EMAIL FAILED - CONSOLE FALLBACK]")
+        print(f" OTP: {otp_code}")
         print(f" For: {recipient_email}")
         print(f"========================================\n")
         return False

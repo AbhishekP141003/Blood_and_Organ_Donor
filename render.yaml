@@ -11,7 +11,7 @@ services:
         generateValue: true
       - key: FLASK_ENV
         value: production
-      - key: EMAIL_ADDRESS
+      - key: SENDGRID_API_KEY
+        sync: false  # You'll need to add this in Render dashboard
+      - key: FROM_EMAIL
         value: abhip141003@gmail.com
-      - key: EMAIL_PASSWORD
-        value: nfldldhiikvbjmgi
