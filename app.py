@@ -3,6 +3,7 @@ import random
 import csv
 import io
 import smtplib
+import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
@@ -11,15 +12,15 @@ from flask import Flask, render_template, request, g, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'campus_secret_key_123_change_in_production'
+app.secret_key = os.environ.get('SECRET_KEY', 'campus_secret_key_123_change_in_production')
 DB_NAME = "campus_donor.db"
 
 # ===== EMAIL CONFIGURATION =====
-# Configure these with your email credentials
+# Configure these with your email credentials or environment variables
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_ADDRESS = 'abhip141003@gmail.com'
-EMAIL_PASSWORD = 'nfldldhiikvbjmgi'     # Gmail App Password configured
+EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS', 'abhip141003@gmail.com')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'nfldldhiikvbjmgi')     # Gmail App Password configured
 
 # IMPORTANT: To get your Gmail App Password:
 # 1. Go to: https://myaccount.google.com/security
@@ -493,6 +494,9 @@ def donor_logout():
     session.pop('donor_name', None)
     return redirect(url_for('home'))
 
-if __name__ == '__main__':
+# Initialize database on startup (for production)
+with app.app_context():
     init_db()
+
+if __name__ == '__main__':
     app.run(debug=True)
