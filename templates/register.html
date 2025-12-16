@@ -110,6 +110,39 @@
         </div>
       </div>
 
+      <!-- Additional Donor Information -->
+      <div class="grid grid-2 gap-3 mb-3">
+        <div>
+          <label for="age">Age <span class="text-danger">*</span></label>
+          <input type="number" id="age" name="age" min="18" max="70" placeholder="18-70 years" required>
+          <small class="text-muted">Must be between 18 and 70 years</small>
+        </div>
+        <div>
+          <label for="gender">Gender <span class="text-danger">*</span></label>
+          <select id="gender" name="gender" required>
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-3 mb-3">
+        <div>
+          <label for="weight">Weight (kg) <span class="text-danger">*</span></label>
+          <input type="number" id="weight" name="weight" min="50" step="0.1" placeholder="Must be above 50 kg" required>
+          <small class="text-muted">Minimum 50 kg required</small>
+        </div>
+        <div>
+          <label for="healthStatus">Health Status <span class="text-danger">*</span></label>
+          <select id="healthStatus" name="health_status" required>
+            <option value="">Select health status</option>
+            <option value="Good">Good</option>
+            <option value="Bad">Bad</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Submit Buttons -->
       <div class="flex gap-2 mt-4">
         <button type="submit" class="btn btn-primary">💾 Submit Registration</button>

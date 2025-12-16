@@ -50,6 +50,39 @@
                 </div>
             </div>
 
+            <!-- Additional Information -->
+            <div class="grid grid-2 gap-3 mb-3">
+                <div>
+                    <label for="age">Age <span style="color: var(--accent-red);">*</span></label>
+                    <input type="number" id="age" name="age" min="18" max="70" value="{{ donor.age or '' }}"
+                        placeholder="18-70 years" required>
+                </div>
+                <div>
+                    <label for="gender">Gender <span style="color: var(--accent-red);">*</span></label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select gender</option>
+                        <option value="Male" {% if donor.gender=='Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if donor.gender=='Female' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-2 gap-3 mb-3">
+                <div>
+                    <label for="weight">Weight (kg) <span style="color: var(--accent-red);">*</span></label>
+                    <input type="number" id="weight" name="weight" min="50" step="0.1" value="{{ donor.weight or '' }}"
+                        placeholder="Minimum 50 kg" required>
+                </div>
+                <div>
+                    <label for="health_status">Health Status <span style="color: var(--accent-red);">*</span></label>
+                    <select id="health_status" name="health_status" required>
+                        <option value="">Select health status</option>
+                        <option value="Good" {% if donor.health_status=='Good' %}selected{% endif %}>Good</option>
+                        <option value="Bad" {% if donor.health_status=='Bad' %}selected{% endif %}>Bad</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="flex gap-2 mt-4">
                 <button type="submit" class="btn btn-primary">💾 Save Changes</button>
                 <a href="/donor/profile" class="btn btn-outline">Cancel</a>

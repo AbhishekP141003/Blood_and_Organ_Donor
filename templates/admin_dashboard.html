@@ -143,6 +143,10 @@
                             <th>Phone</th>
                             <th>Area</th>
                             <th>Blood Group</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Weight</th>
+                            <th>Health</th>
                             <th>Available</th>
                             <th>Registered</th>
                             <th>Actions</th>
@@ -156,6 +160,10 @@
                             <td>{{ donor.phone }}</td>
                             <td>{{ donor.area or '-' }}</td>
                             <td><strong style="color: var(--accent-red);">{{ donor.blood_group }}</strong></td>
+                            <td>{{ donor.age or '-' }}</td>
+                            <td>{{ donor.gender or '-' }}</td>
+                            <td>{{ donor.weight or '-' }} kg</td>
+                            <td>{{ donor.health_status or '-' }}</td>
                             <td>
                                 {% if donor.is_available == 'yes' %}
                                 <span style="color: var(--accent-green);">✓ Yes</span>

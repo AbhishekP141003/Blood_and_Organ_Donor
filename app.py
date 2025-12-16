@@ -109,10 +109,35 @@ def init_db():
                 blood_group TEXT NOT NULL,
                 blood_available TEXT DEFAULT 'yes',
                 is_available TEXT DEFAULT 'yes',
+                age INTEGER,
+                gender TEXT,
+                weight REAL,
+                health_status TEXT,
                 last_login DATETIME,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        # Add new columns if they don't exist (migration for existing databases)
+        try:
+            db.execute("ALTER TABLE donors ADD COLUMN age INTEGER")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
+        try:
+            db.execute("ALTER TABLE donors ADD COLUMN gender TEXT")
+        except sqlite3.OperationalError:
+            pass
+        
+        try:
+            db.execute("ALTER TABLE donors ADD COLUMN weight REAL")
+        except sqlite3.OperationalError:
+            pass
+        
+        try:
+            db.execute("ALTER TABLE donors ADD COLUMN health_status TEXT")
+        except sqlite3.OperationalError:
+            pass
         
         # Search Logs
         db.execute('''
@@ -199,12 +224,16 @@ def register():
             area = request.form.get('area')
             blood_group = request.form.get('blood_group')
             blood_available = request.form.get('blood_available', 'yes')
+            age = request.form.get('age')
+            gender = request.form.get('gender')
+            weight = request.form.get('weight')
+            health_status = request.form.get('health_status')
             
             try:
                 db.execute('''
-                    INSERT INTO donors (name, email, phone, area, blood_group, blood_available)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                ''', (name, email, phone, area, blood_group, blood_available))
+                    INSERT INTO donors (name, email, phone, area, blood_group, blood_available, age, gender, weight, health_status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (name, email, phone, area, blood_group, blood_available, age, gender, weight, health_status))
                 db.commit()
                 
                 # Clear OTP
@@ -455,12 +484,16 @@ def donor_edit():
         area = request.form.get('area')
         blood_group = request.form.get('blood_group')
         blood_available = request.form.get('blood_available', 'yes')
+        age = request.form.get('age')
+        gender = request.form.get('gender')
+        weight = request.form.get('weight')
+        health_status = request.form.get('health_status')
         
         db.execute('''
             UPDATE donors 
-            SET name = ?, email = ?, area = ?, blood_group = ?, blood_available = ?
+            SET name = ?, email = ?, area = ?, blood_group = ?, blood_available = ?, age = ?, gender = ?, weight = ?, health_status = ?
             WHERE id = ?
-        ''', (name, email, area, blood_group, blood_available, session['donor_id']))
+        ''', (name, email, area, blood_group, blood_available, age, gender, weight, health_status, session['donor_id']))
         db.commit()
         
         return redirect(url_for('donor_profile'))

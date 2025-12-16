@@ -145,6 +145,22 @@
                 <div class="info-value" style="color: var(--accent-red);">{{ donor.blood_group }}</div>
             </div>
             <div class="info-item">
+                <div class="info-label">🎂 Age</div>
+                <div class="info-value">{{ donor.age or 'Not provided' }} years</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">👤 Gender</div>
+                <div class="info-value">{{ donor.gender or 'Not specified' }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">⚖️ Weight</div>
+                <div class="info-value">{{ donor.weight or 'Not provided' }} kg</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">💊 Health Status</div>
+                <div class="info-value">{{ donor.health_status or 'Not specified' }}</div>
+            </div>
+            <div class="info-item">
                 <div class="info-label">📅 Registered On</div>
                 <div class="info-value">{{ donor.created_at[:10] }}</div>
             </div>
