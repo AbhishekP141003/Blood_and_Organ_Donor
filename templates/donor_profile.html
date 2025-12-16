@@ -84,6 +84,16 @@
     .toggle-switch.active .toggle-slider {
         transform: translateX(30px);
     }
+
+    .status-available {
+        font-weight: bold;
+        color: var(--accent-green);
+    }
+
+    .status-unavailable {
+        font-weight: bold;
+        color: var(--accent-red);
+    }
 </style>
 {% endblock %}
 
@@ -109,7 +119,7 @@
             </div>
             <div>
                 <span id="statusText"
-                    style="font-weight: bold; color: {% if donor.is_available == 'yes' %}var(--accent-green){% else %}var(--accent-red){% endif %};">
+                    class="{% if donor.is_available == 'yes' %}status-available{% else %}status-unavailable{% endif %}">
                     {% if donor.is_available == 'yes' %}Available{% else %}Unavailable{% endif %}
                 </span>
             </div>
@@ -171,11 +181,11 @@
                 if (data.new_status === 'yes') {
                     toggle.classList.add('active');
                     statusText.textContent = 'Available';
-                    statusText.style.color = 'var(--accent-green)';
+                    statusText.className = 'status-available';
                 } else {
                     toggle.classList.remove('active');
                     statusText.textContent = 'Unavailable';
-                    statusText.style.color = 'var(--accent-red)';
+                    statusText.className = 'status-unavailable';
                 }
             }
         } catch (e) {
