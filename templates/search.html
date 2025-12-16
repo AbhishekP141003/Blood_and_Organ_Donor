@@ -108,7 +108,7 @@
       <div class="security-box">
         <h4 style="margin: 0 0 0.5rem 0; color: #92400e;">🔒 Identity Verification</h4>
         <p style="font-size: 0.9rem; color: #78350f; margin-bottom: 1rem;">
-          Provide your details and verify your phone to search donors
+          Provide your details and verify your email to search donors
         </p>
 
         <div class="grid grid-2 gap-3">
@@ -123,13 +123,13 @@
               placeholder="e.g. STU-2024">
           </div>
           <div>
-            <label>Mobile Number</label>
+            <label>Email Address (OTP Verification)</label>
             <div class="input-group">
-              <input type="text" id="phoneInput" name="seeker_phone" required
-                value="{{ request.args.get('seeker_phone', '') }}" placeholder="Your phone">
+              <input type="email" id="emailInput" name="seeker_email" required
+                value="{{ request.args.get('seeker_email', '') }}" placeholder="your.email@example.com">
               <button type="button" class="btn-otp" id="sendOtpBtn">Get OTP</button>
             </div>
-            <small id="otpStatus" class="text-muted"></small>
+            <small id="otpStatus" class="text-muted">Enter email and click Get OTP</small>
           </div>
           <div>
             <label>Enter OTP Code</label>
@@ -205,45 +205,53 @@
 <script>
   // OTP Logic
   const sendBtn = document.getElementById('sendOtpBtn');
-  const phoneIn = document.getElementById('phoneInput');
+  const emailIn = document.getElementById('emailInput');
+  const nameIn = document.getElementsByName('seeker_name')[0];
   const otpIn = document.getElementById('otpInput');
   const status = document.getElementById('otpStatus');
 
   sendBtn.addEventListener('click', async () => {
-    const phone = phoneIn.value.trim();
-    if (!phone || phone.length < 8) {
-      alert('Enter valid phone number');
+    const email = emailIn.value.trim();
+    const name = nameIn.value.trim();
+
+    if (!email || !email.includes('@')) {
+      alert('Please enter a valid email address');
       return;
     }
 
     sendBtn.disabled = true;
-    status.textContent = 'Requesting OTP...';
+    sendBtn.textContent = 'Sending...';
+    status.textContent = 'Sending OTP to your email...';
     status.className = 'text-muted';
 
     try {
       const res = await fetch('/send_otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone })
+        body: JSON.stringify({ email: email, name: name })
       });
       const data = await res.json();
 
       if (data.success) {
-        status.textContent = '✅ OTP Sent! Check Server Console.';
+        status.textContent = `✅ ${data.message} Check your inbox!`;
         status.className = 'text-success';
         otpIn.disabled = false;
         otpIn.focus();
+        sendBtn.textContent = 'Resend OTP';
+        setTimeout(() => { sendBtn.disabled = false; }, 30000); // Allow resend after 30s
       } else {
-        status.textContent = '❌ Error sending OTP.';
+        status.textContent = '❌ Error: ' + data.message;
         status.className = 'text-danger';
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Get OTP';
       }
     } catch (e) {
       console.error(e);
       status.textContent = 'Network error';
       status.className = 'text-danger';
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Get OTP';
     }
-
-    sendBtn.disabled = false;
   });
 
   // Reveal Contact

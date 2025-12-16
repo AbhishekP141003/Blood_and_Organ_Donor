@@ -263,7 +263,7 @@ def search():
     
     seeker_name = request.args.get('seeker_name', '').strip()
     seeker_id = request.args.get('seeker_id', '').strip()
-    seeker_phone = request.args.get('seeker_phone', '').strip()
+    seeker_email = request.args.get('seeker_email', '').strip()
     user_otp = request.args.get('otp', '').strip()
     
     area_filter = request.args.get('area', '').lower()
@@ -273,19 +273,23 @@ def search():
     search_performed = False
     error_message = None
     
-    if seeker_name and seeker_id and seeker_phone and user_otp:
+    if seeker_name and seeker_id and seeker_email and user_otp:
         server_otp = session.get('current_otp')
+        server_email = session.get('otp_email')
         
         if not server_otp or user_otp != server_otp:
             error_message = "Invalid or expired OTP."
+        elif seeker_email != server_email:
+            error_message = "Email changed after OTP was sent."
         else:
             search_performed = True
             session.pop('current_otp', None)
+            session.pop('otp_email', None)
             
             # Log search
             criteria = f"Area: {area_filter}, BG: {bg_filter}"
             db.execute('INSERT INTO search_logs (seeker_name, seeker_id, seeker_phone, criteria) VALUES (?, ?, ?, ?)',
-                       (seeker_name, seeker_id, seeker_phone, criteria))
+                       (seeker_name, seeker_id, seeker_email, criteria))
             db.commit()
             
             # Query donors
