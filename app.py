@@ -18,8 +18,17 @@ DB_NAME = "campus_donor.db"
 # Configure these with your email credentials
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_ADDRESS = 'your-email@gmail.com'  # Change this
-EMAIL_PASSWORD = 'your-app-password'     # Change this (use App Password for Gmail)
+EMAIL_ADDRESS = 'abhip141003@gmail.com'
+EMAIL_PASSWORD = 'nfldldhiikvbjmgi'     # Gmail App Password configured
+
+# IMPORTANT: To get your Gmail App Password:
+# 1. Go to: https://myaccount.google.com/security
+# 2. Enable "2-Step Verification" (if not already enabled)
+# 3. Go to: https://myaccount.google.com/apppasswords
+# 4. Select "Mail" and "Other (Custom name)"
+# 5. Name it "CampusBloodDonor" and Generate
+# 6. Copy the 16-character password (looks like: xxxx xxxx xxxx xxxx)
+# 7. Paste it above replacing 'your-app-password' (remove spaces)
 
 def send_otp_email(recipient_email, otp_code, recipient_name=""):
     """Send OTP via email"""

@@ -4,15 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CampusDonor{% endblock %}</title>
+    <meta name="description"
+        content="CampusBloodDonor - Connect with blood donors within your campus community. Save lives through quick and verified donor searches.">
+    <meta name="keywords" content="blood donation, campus donors, emergency blood, blood bank, life saving">
+    <meta name="author" content="CampusBloodDonor">
+    <meta name="theme-color" content="#ef4444">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block title %}CampusBloodDonor{% endblock %}">
+    <meta property="og:description" content="Connect with blood donors within your campus community">
+
+    <title>{% block title %}CampusBloodDonor{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ===== CSS VARIABLES & THEME ===== */
         :root {
-            /* Light Mode Colors */
+            /* Light Mode Colors - Professional Medical Theme */
             --bg-primary: #ffffff;
             --bg-secondary: #f8fafc;
-            --bg-gradient-start: #f4f7fb;
+            --bg-tertiary: #f1f5f9;
+            --bg-gradient-start: #fafbfc;
             --bg-gradient-end: #ffffff;
 
             --text-primary: #0f172a;
@@ -20,25 +39,38 @@
             --text-muted: #64748b;
 
             --border-color: #e2e8f0;
-            --border-light: rgba(15, 23, 42, 0.04);
+            --border-light: rgba(15, 23, 42, 0.06);
 
             --card-bg: #ffffff;
             --card-shadow: rgba(15, 23, 42, 0.08);
+            --card-shadow-hover: rgba(15, 23, 42, 0.15);
 
-            --accent-primary: #06b6d4;
-            --accent-secondary: #0ea5a5;
-            --accent-red: #ef4444;
+            --accent-primary: #0891b2;
+            --accent-primary-hover: #0e7490;
+            --accent-secondary: #06b6d4;
+            --accent-red: #dc2626;
+            --accent-red-light: #ef4444;
             --accent-green: #16a34a;
+            --accent-green-hover: #15803d;
+            --accent-orange: #ea580c;
+            --accent-blue: #2563eb;
 
-            --input-bg: #fbfeff;
-            --input-border: #e6eef6;
+            --input-bg: #ffffff;
+            --input-border: #e2e8f0;
+            --input-focus: #0891b2;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            --gradient-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            --gradient-green: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
         }
 
-        /* Dark Mode Colors */
+        /* Dark Mode Colors - Professional Dark Theme */
         [data-theme="dark"] {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
-            --bg-gradient-start: #0f172a;
+            --bg-tertiary: #334155;
+            --bg-gradient-start: #0a0f1a;
             --bg-gradient-end: #1e293b;
 
             --text-primary: #f1f5f9;
@@ -46,18 +78,30 @@
             --text-muted: #94a3b8;
 
             --border-color: #334155;
-            --border-light: rgba(241, 245, 249, 0.08);
+            --border-light: rgba(241, 245, 249, 0.1);
 
             --card-bg: #1e293b;
-            --card-shadow: rgba(0, 0, 0, 0.3);
+            --card-shadow: rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: rgba(0, 0, 0, 0.6);
 
-            --accent-primary: #22d3ee;
+            --accent-primary: #06b6d4;
+            --accent-primary-hover: #22d3ee;
             --accent-secondary: #14b8a6;
-            --accent-red: #f87171;
+            --accent-red: #ef4444;
+            --accent-red-light: #f87171;
             --accent-green: #22c55e;
+            --accent-green-hover: #4ade80;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
 
             --input-bg: #0f172a;
             --input-border: #334155;
+            --input-focus: #06b6d4;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            --gradient-green: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
         }
 
         /* ===== GLOBAL STYLES ===== */
@@ -67,6 +111,10 @@
             padding: 0;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
@@ -74,6 +122,45 @@
             min-height: 100vh;
             transition: background 0.3s ease, color 0.3s ease;
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+        }
+
+        a {
+            color: var(--accent-primary);
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--accent-primary-hover);
         }
 
         /* ===== NAVIGATION ===== */
@@ -454,6 +541,88 @@
             }
         }
 
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-red);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .footer-section a {
+            display: block;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent-primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-light);
+            padding-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .social-link:hover {
+            background: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
             {
             % block extra_styles %
         }
@@ -502,6 +671,63 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Professional Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- About Section -->
+                <div class="footer-section">
+                    <h4>🩸 CampusBloodDonor</h4>
+                    <p>
+                        Connecting blood donors within your campus community.
+                        Save lives through quick, verified, and trusted donor searches.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">📘</a>
+                        <a href="#" class="social-link" aria-label="Twitter">🐦</a>
+                        <a href="#" class="social-link" aria-label="Instagram">📷</a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">💼</a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="/">Home</a>
+                    <a href="/register">Register as Donor</a>
+                    <a href="/search">Search Donors</a>
+                    <a href="/donor/login">Donor Login</a>
+                    <a href="/admin/login">Admin Portal</a>
+                </div>
+
+                <!-- Information -->
+                <div class="footer-section">
+                    <h4>Information</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">How It Works</a>
+                    <a href="#">FAQ</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-section">
+                    <h4>Contact Us</h4>
+                    <p>📧 Email: abhip141003@gmail.com</p>
+                    <p>📞 Emergency: Available 24/7</p>
+                    <p>📍 Campus Administration Office</p>
+                    <p style="margin-top: 1rem;">
+                        <strong>For urgent blood needs, please contact local blood banks or hospitals.</strong>
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2024 CampusBloodDonor. All rights reserved. Made with ❤️ for saving lives.</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Base JavaScript -->
     <script>

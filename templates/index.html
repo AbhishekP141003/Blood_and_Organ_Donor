@@ -4,200 +4,348 @@
 
 {% block extra_styles %}
 <style>
-  .hero {
+  /* Hero Section */
+  .hero-section {
     display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 2rem;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 3rem;
     align-items: center;
-    margin: 2rem 0;
+    padding: 3rem 0;
+    margin-bottom: 4rem;
   }
 
-  @media (max-width: 900px) {
-    .hero {
-      grid-template-columns: 1fr;
-    }
+  .hero-content {
+    max-width: 600px;
   }
 
   .hero-title {
-    font-size: 2.5rem;
-    color: var(--text-primary);
+    font-size: 3rem;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 1rem;
     line-height: 1.2;
   }
 
   .hero-subtitle {
+    font-size: 1.15rem;
     color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+  }
+
+  .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-red);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
     margin-bottom: 1.5rem;
+  }
+
+  .btn-hero-primary {
+    background: var(--gradient-red);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.25);
+    transition: all 0.3s;
+  }
+
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(220, 38, 38, 0.35);
+  }
+
+  .btn-hero-outline {
+    background: transparent;
+    color: var(--accent-primary);
+    border: 2px solid var(--accent-primary);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .btn-hero-outline:hover {
+    background: var(--accent-primary);
+    color: white;
+  }
+
+  .hero-note {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .hero-image {
+    position: relative;
+  }
+
+  .image-container {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  }
+
+  .image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Features Section */
+  .features-section,
+  .how-it-works,
+  .impact-section {
+    margin: 4rem 0;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px var(--card-shadow-hover);
+    border-color: var(--accent-primary);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .feature-card h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  .feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* How It Works */
+  .steps-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 3rem;
+  }
+
+  .step-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 2px solid var(--border-light);
+    text-align: center;
+    position: relative;
+  }
+
+  .step-number {
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+  }
+
+  .step-card h3 {
+    margin-bottom: 0.75rem;
+  }
+
+  .step-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .step-connector {
+    font-size: 2rem;
+    color: var(--accent-primary);
+    text-align: center;
+  }
+
+  /* CTA Banner */
+  .cta-banner {
+    background: var(--gradient-red);
+    color: white;
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+  }
+
+  .cta-banner h3 {
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-banner p {
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+  }
+
+  .btn-lg {
+    padding: 1rem 2.5rem;
     font-size: 1.1rem;
+  }
+
+  /* Impact Section */
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
   }
 
   .impact-card {
     background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px var(--card-shadow);
-  }
-
-  .impact-stats {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .stat-box {
-    flex: 1;
-    text-align: center;
-    padding: 1.25rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-  }
-
-  [data-theme="dark"] .stat-box {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%);
-  }
-
-  .stat-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    line-height: 1;
-    display: block;
-    color: #ef4444;
-  }
-
-  .stat-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-top: 0.5rem;
-    color: #991b1b;
-  }
-
-  [data-theme="dark"] .stat-label {
-    color: #fca5a5;
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-
-  .info-card {
-    background: var(--card-bg);
-    padding: 1.75rem;
-    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
     border: 1px solid var(--border-light);
-    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+    transition: all 0.3s;
   }
 
-  .info-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px var(--card-shadow);
+  .impact-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 30px var(--card-shadow-hover);
   }
 
-  .info-card h4 {
+  .impact-icon {
+    font-size: 3rem;
     margin-bottom: 1rem;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #ef4444;
   }
 
-  .info-card p {
+  .impact-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent-red);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .impact-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* Info Banner */
+  .info-banner {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    padding: 2rem;
+    border-radius: 16px;
+    border-left: 4px solid var(--accent-blue);
+    margin: 3rem 0;
+  }
+
+  [data-theme="dark"] .info-banner {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.15));
+  }
+
+  .info-banner h3 {
+    margin-bottom: 1rem;
+    color: var(--accent-blue);
+  }
+
+  .info-banner ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .info-banner li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
     color: var(--text-secondary);
     line-height: 1.7;
   }
-</style>
-{% endblock %}
 
-{% block content %}
-<div class="container">
-  <div class="card fade-in">
-    <section class="hero">
-      <div>
-        <h2 class="hero-title">Save Lives within your Campus 🩸</h2>
-        <p class="hero-subtitle">
-          CampusBloodDonor helps students and staff register as blood donors.
-          Connect with donors instantly during emergencies.
-        </p>
+  .info-banner li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent-blue);
+    font-weight: bold;
+    font-size: 1.5rem;
+    line-height: 1;
+  }
 
-        <div class="flex gap-2" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
-          <a href="/register" class="btn btn-primary">✨ Register as Blood Donor</a>
-          <a href="/donor/login" class="btn btn-outline">👤 Donor Login</a>
-        </div>
-
-        <div>
-          <a href="/search" class="btn btn-outline">🩸 Search Blood Donors</a>
-        </div>
-      </div>
-
-      <div class="impact-card">
-        <h3 style="margin-bottom: 0.5rem;">Campus Impact</h3>
-        <p class="text-muted" style="font-size: 0.9rem;">Real-time database availability</p>
-
-        <div class="impact-stats">
-          <div class="stat-box">
-            <span class="stat-number">{{ blood_count }}</span>
-            <div class="stat-label">Blood Donors</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <hr style="border: none; height: 1px; background: var(--border-color); margin: 3rem 0;">
-
-    <section>
-      <h3 style="font-size: 1.75rem; margin-bottom: 1.5rem; text-align: center;">Why Blood Donation Matters</h3>
-
-      <div class="info-grid">
-        <div class="info-card">
-          <h4>🩸 Life-Saving Impact</h4>
-          <p>
-            Blood cannot be manufactured; it can only come from generous donors.
-            <strong>One donation can save up to 3 lives</strong>.
-            Your blood is vital for surgeries, cancer treatments, chronic illnesses, and emergencies.
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h4>⚡ Fast & Safe</h4>
-          <p>
-            The donation process is safe, quick, and makes a direct impact on your campus community.
-            Healthy adults can donate every 12 weeks, and each donation takes about 10-15 minutes.
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h4>🎯 Campus Community</h4>
-          <p>
-            Help your fellow students and staff during medical emergencies.
-            Build a trusted network of blood donors within your campus for faster response times.
-          </p>
-        </div>
-      </div>
-    </section>
-  </div>
-</div>
-
-<!-- Success Toast -->
-{% if request.args.get('success') == '1' %}
-<div id="successToast" style="
+  /* Toast */
+  .toast {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    background: linear-gradient(135deg, #16a34a, #22c55e);
+    background: var(--gradient-green);
     color: white;
     padding: 1rem 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     animation: slideIn 0.4s ease;
     z-index: 1000;
-">
-  ✅ Registration Successful! Thank you for joining.
-</div>
+    font-weight: 600;
+  }
 
-<style>
   @keyframes slideIn {
     from {
       transform: translateX(400px);
@@ -221,17 +369,270 @@
       opacity: 0;
     }
   }
+
+  /* Responsive Design */
+  @media (max-width: 968px) {
+    .hero-section {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .hero-title {
+      font-size: 2.25rem;
+    }
+
+    .steps-container {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .step-connector {
+      transform: rotate(90deg);
+    }
+
+    .hero-stats {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-cta {
+      flex-direction: column;
+    }
+
+    .btn-hero-primary,
+    .btn-hero-outline {
+      width: 100%;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+    }
+  }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Hero Section -->
+  <div class="hero-section fade-in">
+    <div class="hero-content">
+      <h1 class="hero-title">Save Lives Within Your Campus 🩸</h1>
+      <p class="hero-subtitle">
+        Connect with verified blood donors instantly. Join a trusted community of life-savers
+        ready to respond in emergencies. Every drop counts.
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number" id="donorCount">{{ blood_count }}</span>
+          <span class="stat-label">Active Donors</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">Available</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">&lt;10min</span>
+          <span class="stat-label">Avg Response</span>
+        </div>
+      </div>
+
+      <div class="hero-cta">
+        <a href="/register" class="btn btn-hero-primary">✨ Become a Donor</a>
+        <a href="/search" class="btn btn-hero-outline">🔍 Find Donors Now</a>
+      </div>
+
+      <p class="hero-note">
+        🔒 Secure · ⚡ Instant · ✅ Verified Donors
+      </p>
+    </div>
+
+    <div class="hero-image">
+      <div class="image-container">
+        <img
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23f1f5f9' width='400' height='300'/%3E%3Ccircle cx='200' cy='150' r='80' fill='%23dc2626' opacity='0.1'/%3E%3Ctext x='200' y='150' font-size='24' text-anchor='middle' fill='%23dc2626'%3E🩸%3C/text%3E%3Ctext x='200' y='180' font-size='14' text-anchor='middle' fill='%2364748b'%3ESaving Lives Daily%3C/text%3E%3C/svg%3E"
+          alt="Blood Donation Hero" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Cards -->
+  <section class="features-section">
+    <h2 class="section-title">Why Choose CampusBloodDonor?</h2>
+    <p class="section-subtitle">The trusted platform for campus blood donation</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>Find blood donors in seconds. Our streamlined search connects you with available donors instantly during
+          emergencies.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Verified Donors</h3>
+        <p>All donors are verified through OTP authentication and campus credentials for your safety and trust.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Privacy First</h3>
+        <p>Your contact information is protected and only revealed when you choose. Complete control over your
+          availability.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Campus Community</h3>
+        <p>Connect with fellow students and staff. Build a stronger, more resilient campus community together.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Mobile Friendly</h3>
+        <p>Access from any device, anywhere. Responsive design ensures smooth experience on all screens.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">💝</div>
+        <h3>Save Lives</h3>
+        <p>One donation can save up to 3 lives. Be part of something bigger and make a real difference.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">Simple steps to start saving lives</p>
+
+    <div class="steps-container">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>Register</h3>
+        <p>Create your donor profile in under 2 minutes with email verification</p>
+      </div>
+
+      <div class="step-connector">→</div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>Get Verified</h3>
+        <p>Confirm your email and provide your blood type and availability</p>
+      </div>
+
+      <div class="step-connector">→</div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>Save Lives</h3>
+        <p>Get notified when someone needs your blood type and respond instantly</p>
+      </div>
+    </div>
+
+    <div class="cta-banner">
+      <h3>Ready to Make a Difference?</h3>
+      <p>Join {{ blood_count }}+ donors already making an impact</p>
+      <a href="/register" class="btn btn-primary btn-lg">Register Now</a>
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section class="impact-section">
+    <h2 class="section-title">Our Impact</h2>
+
+    <div class="impact-grid">
+      <div class="impact-card">
+        <div class="impact-icon">🩸</div>
+        <div class="impact-number">{{ blood_count }}</div>
+        <div class="impact-label">Registered Donors</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">🏥</div>
+        <div class="impact-number">24/7</div>
+        <div class="impact-label">Emergency Support</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">⚡</div>
+        <div class="impact-number">&lt;10m</div>
+        <div class="impact-label">Average Response</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-icon">❤️</div>
+        <div class="impact-number">100%</div>
+        <div class="impact-label">Free Service</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Important Info -->
+  <section class="info-banner">
+    <h3>🚨 Important Information</h3>
+    <ul>
+      <li><strong>Eligibility:</strong> Must be 18+ years old, weigh at least 50kg, and be in good health</li>
+      <li><strong>Frequency:</strong> You can donate blood every 12 weeks (3 months)</li>
+      <li><strong>Emergency:</strong> For urgent needs, also contact local blood banks and hospitals</li>
+      <li><strong>Privacy:</strong> Your contact details are only shared when you approve a request</li>
+    </ul>
+  </section>
+</div>
+
+<!-- Success Toast -->
+{% if request.args.get('success') == '1' %}
+<div id="successToast" class="toast">
+  ✅ Registration Successful! Thank you for joining our life-saving community.
+</div>
 
 <script>
   setTimeout(() => {
     const toast = document.getElementById('successToast');
-    toast.style.animation = 'slideOut 0.4s ease';
-    setTimeout(() => toast.remove(), 400);
+    if (toast) {
+      toast.style.animation = 'slideOut 0.4s ease';
+      setTimeout(() => toast.remove(), 400);
+    }
   }, 3000);
 
   // Clean URL
   window.history.replaceState({}, document.title, '/');
 </script>
 {% endif %}
+
+<script>
+  // Animate counter on page load
+  function animateCounter(element, target) {
+    let count = 0;
+    const duration = 2000;
+    const increment = target / (duration / 16);
+
+    const timer = setInterval(() => {
+      count += increment;
+      if (count >= target) {
+        count = target;
+        clearInterval(timer);
+      }
+      element.textContent = Math.floor(count);
+    }, 16);
+  }
+
+  // Animate donor count
+  window.addEventListener('DOMContentLoaded', () => {
+    const counterEl = document.getElementById('donorCount');
+    if (counterEl) {
+      const target = parseInt(counterEl.textContent);
+      counterEl.textContent = '0';
+      animateCounter(counterEl, target);
+    }
+  });
+</script>
 {% endblock %}
