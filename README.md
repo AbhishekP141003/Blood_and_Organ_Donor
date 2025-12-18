@@ -60,19 +60,35 @@ Default admin is configured in `app.py` (lines 143-147). Change the email and pa
 ## Deployment
 
 ### Render (Recommended)
-1. Push your code to GitHub
-2. Create a new Web Service on [Render](https://render.com)
-3. Connect your GitHub repository
-4. Render will auto-detect settings from `render.yaml`
-5. Deploy!
+
+#### Step 1: Create PostgreSQL Database
+1. Go to [Render Dashboard](https://dashboard.render.com)
+2. Click "New +" → "PostgreSQL"
+3. Name: `campusblooddonor-db` (or your choice)
+4. Select Free tier
+5. Click "Create Database"
+6. Copy the **Internal Database URL** (starts with `postgres://`)
+
+#### Step 2: Deploy Web Service
+1. In Render, click "New +" → "Web Service"
+2. Connect your GitHub repository: `AbhishekP141003/Blood_and_Organ_Donor`
+3. Settings will be auto-detected from `render.yaml`
+4. Add Environment Variable:
+   - **Key**: `DATABASE_URL`
+   - **Value**: Paste the PostgreSQL Internal URL from Step 1
+5. (Optional) Add `SENDGRID_API_KEY` and `FROM_EMAIL` for email functionality
+6. Click "Create Web Service"
+
+Your app will deploy automatically! Data will now persist across deployments.
 
 ## Tech Stack
 
 - **Backend**: Flask 3.0.0
-- **Database**: SQLite
-- **Email**: SMTP (Gmail)
+- **Database**: PostgreSQL (production) / SQLite (local dev)
+- **Email**: SendGrid API
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Fonts**: Google Fonts (Inter, Poppins)
+- **Hosting**: Render.com
 
 ## Project Structure
 

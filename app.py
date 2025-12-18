@@ -8,9 +8,20 @@ from functools import wraps
 from flask import Flask, render_template, request, g, redirect, url_for, session, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 
+# Database imports
+try:
+    import psycopg2
+    import psycopg2.extras
+    PSYCOPG2_AVAILABLE = True
+except ImportError:
+    PSYCOPG2_AVAILABLE = False
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'campus_secret_key_123_change_in_production')
-DB_NAME = "campus_donor.db"
+
+# Database configuration
+DATABASE_URL = os.environ.get('DATABASE_URL')  # PostgreSQL URL from Render
+DB_NAME = "campus_donor.db"  # SQLite fallback for local development
 
 # ===== SENDGRID EMAIL CONFIGURATION =====
 # SendGrid is more reliable than Gmail SMTP for production deployments
@@ -82,10 +93,19 @@ def send_otp_email(recipient_email, otp_code, recipient_name=""):
 
 # ===== DATABASE HELPER FUNCTIONS =====
 def get_db():
+    """Get database connection - PostgreSQL if DATABASE_URL is set, otherwise SQLite"""
     db = getattr(g, '_database', None)
+    
     if db is None:
-        db = g._database = sqlite3.connect(DB_NAME)
-        db.row_factory = sqlite3.Row
+        if DATABASE_URL and PSYCOPG2_AVAILABLE:
+            # Use PostgreSQL for production
+            db = g._database = psycopg2.connect(DATABASE_URL)
+            db.row_factory = psycopg2.extras.RealDictCursor
+        else:
+            # Use SQLite for local development
+            db = g._database = sqlite3.connect(DB_NAME)
+            db.row_factory = sqlite3.Row
+    
     return db
 
 @app.teardown_appcontext
@@ -95,80 +115,130 @@ def close_connection(exception):
         db.close()
 
 def init_db():
+    """Initialize database tables - works with both PostgreSQL and SQLite"""
     with app.app_context():
         db = get_db()
+        cursor = db.cursor()
         
-        # Donors Table - Blood Donors Only (Email now required)
-        db.execute('''
-            CREATE TABLE IF NOT EXISTS donors (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                phone TEXT NOT NULL UNIQUE,
-                area TEXT,
-                blood_group TEXT NOT NULL,
-                blood_available TEXT DEFAULT 'yes',
-                is_available TEXT DEFAULT 'yes',
-                age INTEGER,
-                gender TEXT,
-                weight REAL,
-                health_status TEXT,
-                last_login DATETIME,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+        # Determine if we're using PostgreSQL or SQLite
+        is_postgres = DATABASE_URL and PSYCOPG2_AVAILABLE
         
-        # Add new columns if they don't exist (migration for existing databases)
-        try:
-            db.execute("ALTER TABLE donors ADD COLUMN age INTEGER")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
-        
-        try:
-            db.execute("ALTER TABLE donors ADD COLUMN gender TEXT")
-        except sqlite3.OperationalError:
-            pass
-        
-        try:
-            db.execute("ALTER TABLE donors ADD COLUMN weight REAL")
-        except sqlite3.OperationalError:
-            pass
-        
-        try:
-            db.execute("ALTER TABLE donors ADD COLUMN health_status TEXT")
-        except sqlite3.OperationalError:
-            pass
-        
-        # Search Logs
-        db.execute('''
-            CREATE TABLE IF NOT EXISTS search_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                seeker_name TEXT,
-                seeker_id TEXT,
-                seeker_phone TEXT,
-                criteria TEXT,
-                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Admins Table
-        db.execute('''
-            CREATE TABLE IF NOT EXISTS admins (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+        # Use appropriate SQL syntax for each database
+        if is_postgres:
+            # PostgreSQL syntax
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS donors (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL UNIQUE,
+                    area TEXT,
+                    blood_group TEXT NOT NULL,
+                    blood_available TEXT DEFAULT 'yes',
+                    is_available TEXT DEFAULT 'yes',
+                    age INTEGER,
+                    gender TEXT,
+                    weight REAL,
+                    health_status TEXT,
+                    last_login TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS search_logs (
+                    id SERIAL PRIMARY KEY,
+                    seeker_name TEXT,
+                    seeker_id TEXT,
+                    seeker_phone TEXT,
+                    criteria TEXT,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS admins (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        else:
+            # SQLite syntax
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS donors (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    phone TEXT NOT NULL UNIQUE,
+                    area TEXT,
+                    blood_group TEXT NOT NULL,
+                    blood_available TEXT DEFAULT 'yes',
+                    is_available TEXT DEFAULT 'yes',
+                    age INTEGER,
+                    gender TEXT,
+                    weight REAL,
+                    health_status TEXT,
+                    last_login DATETIME,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS search_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    seeker_name TEXT,
+                    seeker_id TEXT,
+                    seeker_phone TEXT,
+                    criteria TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS admins (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
         
         # Create default admin if not exists
-        admin_exists = db.execute("SELECT * FROM admins WHERE email = 'abhip141003@gmail.com'").fetchone()
+        if is_postgres:
+            cursor.execute("SELECT * FROM admins WHERE email = %s", ('abhip141003@gmail.com',))
+        else:
+            cursor.execute("SELECT * FROM admins WHERE email = ?", ('abhip141003@gmail.com',))
+        
+        admin_exists = cursor.fetchone()
         if not admin_exists:
             hashed_pw = generate_password_hash('Abhi@Engineering')
-            db.execute("INSERT INTO admins (email, password_hash) VALUES (?, ?)", 
-                      ('abhip141003@gmail.com', hashed_pw))
+            if is_postgres:
+                cursor.execute("INSERT INTO admins (email, password_hash) VALUES (%s, %s)", 
+                              ('abhip141003@gmail.com', hashed_pw))
+            else:
+                cursor.execute("INSERT INTO admins (email, password_hash) VALUES (?, ?)", 
+                              ('abhip141003@gmail.com', hashed_pw))
         
         db.commit()
+        cursor.close()
+
+def query(sql, params=None):
+    """Execute query with automatic placeholder conversion for PostgreSQL/SQLite"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Convert ? to %s for PostgreSQL
+    if DATABASE_URL and PSYCOPG2_AVAILABLE:
+        sql = sql.replace('?', '%s')
+    
+    if params:
+        cursor.execute(sql, params)
+    else:
+        cursor.execute(sql)
+    
+    return cursor
 
 # ===== AUTHENTICATION DECORATORS =====
 def admin_required(f):
